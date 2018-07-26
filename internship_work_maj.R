@@ -2,7 +2,7 @@
 #                                                                                   #
 #              INTERNSHIP - MASTER I/II - BIOSTATISTICS - Personnal work            #
 #                       Latent variables model - IRT - Rasch                        #
-#                                   S. SIGALLA                                      #
+#                                     S. SIGL                                       #
 #                                                                                   #
 #===================================================================================#
 
@@ -29,11 +29,6 @@
 
 #===================================================================================#
 # first database : dichotomous items
-
-#url <- "http://publicifsv.sund.ku.dk/~kach/AMTS/AMTS.csv"
-#AMTS <- read.table(url, header = TRUE, sep = ",", dec = ".")
-#items <- AMTS[, c(1:10)]
-
 
 # function to lead a likelihood ratio test
 LRtest = function(model0,model1,display){
@@ -129,14 +124,7 @@ splitTot = function(data,items,itemlist,diffvar,constraint){
 #par(mfrow=c(1,1))
 
 #===================================================================================#
-# second database : polytomous items :
-
-#url <- "http://publicifsv.sund.ku.dk/~kach/SF36/PF_orig.csv"
-#PF <- read.table(url, header = TRUE, sep = ",", dec = ".")
-#items = PF[,-1]-1
-# on retire les lignes entières de non réponses
-#items <- subset(items,rowSums(is.na(items)) != ncol(items))
-
+# polytomous items
 
 # returns a dataframe with the eta and expected value corresponding to a gpcm-fit object
 esperance = function(data,item,itemlist,constraint){
@@ -340,19 +328,9 @@ difPolyTotAutoPlot = function(data,items,itemlist,diffvar,constraint,path){
 }
 
 
-#difPoly(data=items,item=c(1),itemlist=c(1:8,10),diffvar=c(9),constraint="rasch")
-
 
 #===================================================================================#
 # simulation - confidence intervals
-
-#data = items
-#item=c(2)
-#itemlist=c(1:10)
-#constraint="gpcm"
-#B=10
-#scoreGrp = 5
-
 
 simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
   if(class(item)!="character"){
