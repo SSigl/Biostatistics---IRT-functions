@@ -1,6 +1,6 @@
 #===================================================================================#
 #                                                                                   #
-#              INTERNSHIP - MASTER I/II - BIOSTATISTICS - Personnal work            #
+#              INTERNSHIP - MASTER I/II - BIOSTATISTICS - Personal work            #
 #                       Latent variables model - IRT - Rasch                        #
 #                                     S. SIGL                                       #
 #                                                                                   #
