@@ -631,6 +631,31 @@ testItem_Tot = function(dataList,items,itemlist,covariates,constraint,eps){
   names(result_Tot) <- items
   return(result_Tot)
 }
+                      
+#===================================================================================#
+# to select a same number of row for each study
+
+# this function is supposed to sample n lines from a dataframe from each part, according to a variable "refvar"
+# for example for a dataframe gathering results for 450 cancerous patients and 180 diabetic patients
+# we wish to select 100 of each study (so we have a same number of patients for each value of the variable "study")
+selectAleat = function(data,refvar,n){
+  values = levels(as.factor(data[,refvar]))  
+  p=length(values)
+  var_names = c()
+  for(i in 1:p){
+    var_names[i] = paste(refvar,i,sep="_")
+    data_t = subset(data,data[,refvar]==values[i])
+    data_t = data_t[sample(nrow(data_t),size=n,replace=FALSE),]
+    # in order to avoid any index problem :
+    rownames(data_t) <- NULL
+    assign(var_names[i],data_t)
+  }
+  data_t = get(var_names[1])
+  for(i in 2:p){
+    data_t=rbind(data_t,get(var_names[i]))
+  }
+  return(data_t)  
+}
 
 
 
