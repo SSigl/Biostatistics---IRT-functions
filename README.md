@@ -12,6 +12,9 @@ We need several packages to correctly run the functions we are about to describe
 
 # Likelihood Ratio Test :
 
+In this study, we need to test DIF (Differential Item Functioning). What is DIF ? DIF occurs for an item when people with the same ability but from different groups (groups defined by a covariate, such as gender or age) have unequal probabilities of giving a response. In other words, the conditional probability of success for a DIF-item depends on the value of a covariate. To apply Rasch models, we must have no DIF items. We then need to test that hypothesis when we apply a Rasch model. To this end, we proceed the following way :
+
+ 
 
 
 
