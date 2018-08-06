@@ -22,7 +22,8 @@ We take an example : suppose we suspect item1 to be a DIF for the covariate "Sex
 
 - then, we may apply a LR-test : if the p-value is under a specified thereshold, then we can reject the null hypothesis : "there is no DIF". 
 
-To this end, we wrote the "LRtest" function, which very basically apply a log-likelihood ratio test. The function returns the value of the LR-test, the degrees of freedom and the p-value. 
+To this end, we wrote the "LRtest" function, which very basically apply a log-likelihood ratio test. This function takes in argument two models, for example gpcm objects : the first model must be the one with the original item, and the second model the one with the items created from the covariate. This function has also a "display" argument : "display" must be a boolean, equal to "TRUE" if you wish to display the result in the R-Console. 
+The function returns the value of the LR-test, the degrees of freedom and the p-value. 
 
 
 
