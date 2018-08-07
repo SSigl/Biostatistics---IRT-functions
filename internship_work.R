@@ -324,7 +324,7 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
   for(b in 1:B){
     # boostrap : we sample some rows
     data_B = persons[sample(nrow(persons),size=N,replace=TRUE),]
-    data_B = subset(persons,select=c("z1"))
+    data_B = subset(data_B,select=c("z1"))
     # in order to avoid any index problem :
     rownames(data_B) <- NULL
     
