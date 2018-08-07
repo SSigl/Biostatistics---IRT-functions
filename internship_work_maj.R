@@ -395,6 +395,17 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
   legend("bottomright",legend=c("real score","sim score"),col=c("blue","red"),lty=c(1,3),cex=0.6)
 }
                             
+
+# same as before, we now want to directly apply the function on a list of items
+simulation_1_Tot = function(data,items,itemlist,constraint,B,scoreGrp)
+  {
+  len = length(items)
+  par(mfrow=selectPar(len))
+  for(i in 1:len){
+    simulation_1(data=data,item=items[i],itemlist=itemlist,constraint=constraint,B=B,scoreGrp=scoreGrp)
+  }
+}
+                            
 # now, we want to add a split option according to a differenciation variable diffvar
 # for that, we need a very simple differenciation function 
 
@@ -423,16 +434,6 @@ diff_fct = function(data,item,diffvar){
   
   result = list("data"=data,"var_names"=var_names)
   return(result)
-}
-
-# same as before, we now want to directly apply the function on a list of items
-simulation_1_Tot = function(data,items,itemlist,constraint,B,scoreGrp)
-  {
-  len = length(items)
-  par(mfrow=selectPar(len))
-  for(i in 1:len){
-    simulation_1(data=data,item=items[i],itemlist=itemlist,constraint=constraint,B=B,scoreGrp=scoreGrp)
-  }
 }
 
 # now we want a diff option
