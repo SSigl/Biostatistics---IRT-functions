@@ -84,8 +84,6 @@ esperance = function(data,item,itemlist,constraint){
   Probas$esp <- Probas[,paste("p",1,sep="_")]*as.numeric(values[1])
   for(j in 2:n){
     Probas$esp <- Probas$esp + Probas[,paste("p",j,sep="_")]*as.numeric(values[j])}
-  # now we may plot it !
-  #plot(eta,Probas$esp,col=c(1),type="l",xlab="eta",ylab="Espérance")
   return(Probas)
 }
 
