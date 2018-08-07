@@ -178,51 +178,57 @@ difPoly = function(data,item,itemlist,diffvar,constraint,toPlot=FALSE){
   it0 <- data[,c(itemlist)]  
   # we remove the suspected item from the itemlist (it is easier to proceed that way)
   if(class(itemlist)!="character"){
-  k_1 = which(colnames(data)==item)
-  k_1 = which(itemlist==k_1)
-  itemlist = itemlist[-k_1]}else{
-    k_1 = which(itemlist==item)
-    itemlist = itemlist[-k_1]
-  }
+    k_1 = which(colnames(data)==item)
+    k_1 = which(itemlist==k_1)
+    itemlist = itemlist[-k_1]}else{
+      k_1 = which(itemlist==item)
+      itemlist = itemlist[-k_1]
+    }
   # we add the new created items : (m+1):(m+n)
   if(class(itemlist)!="character"){
-  it1 <- data[,c(itemlist,(m+1):(m+n))]}else{
-    it1 <- data[,c(itemlist,colnames(data)[(m+1):(m+n)])]
-  }  
+    it1 <- data[,c(itemlist,(m+1):(m+n))]}else{
+      it1 <- data[,c(itemlist,colnames(data)[(m+1):(m+n)])]
+    }  
   # we create the model (even if we do it in the esperance function, in order to make a LR test)
   fit0 = gpcm(it0,constraint=constraint)
   fit1 = gpcm(it1,constraint=constraint)
   
-  # two options : either we want the p-value and the plot, either we only want the p-value
-  if(toPlot==TRUE){
-  # we "re-initialize" itemlist to apply the "esperance" function
-  len = dim(it1)[2]
-  itemlist <- c(1:len)
-  # we consider the variables whom the name starts with the name of the suspected item
-  # i.e. all new created variables
-  l = grep(paste(item,"",sep="_"), colnames(it1))
-  # we create several database "Probas" containing the expected values for every new created item
-  for(j in l){
-    k = n-(len - j)
-    assign(paste("dataPr",k,sep="_"),esperance(data=it1,item=c(j),itemlist=itemlist,constraint))
-  }
-  y_sup = max(as.integer(levels(as.factor(data[,item]))))
-  y_inf = min(as.integer(levels(as.factor(data[,item]))))
-  plot(dataPr_1[,"eta"],dataPr_1[,"esp"],col=c(1),type="l",xlab="eta",ylab="Expected value",ylim=c(y_inf,y_sup))
-  for(j in 2:n){
-    data = get(paste("dataPr",j,sep="_"))
-    lines(data[,"eta"],data[,"esp"],col=c(j))
-  }
-  legend("bottomright",legend=c(var_names),col=c(1:n),lty=rep(1,n),cex=0.6)
-  titre = paste("DIF-test for the item",item,sep=" ")
-  title(sub=titre)
+  # we save the coefficients of the parameters of the "big" model :
+  parameters = fit0$coefficients
   
-  # we also want the likelihood ratio
-  cat(paste("For the item",item,sep=" "))
-  LRtest(fit0,fit1,display=TRUE)}
+  # two options : either we want the p-value, the parameters and the plot, either we only want the p-value and the parameters
+  if(toPlot==TRUE){
+    # we "re-initialize" itemlist to apply the "esperance" function
+    len = dim(it1)[2]
+    itemlist <- c(1:len)
+    # we consider the variables whom the name starts with the name of the suspected item
+    # i.e. all new created variables
+    l = grep(paste(item,"",sep="_"), colnames(it1))
+    # we create several database "Probas" containing the expected values for every new created item
+    for(j in l){
+      k = n-(len - j)
+      assign(paste("dataPr",k,sep="_"),esperance(data=it1,item=c(j),itemlist=itemlist,constraint))
+    }
+    y_sup = max(as.integer(levels(as.factor(data[,item]))))
+    y_inf = min(as.integer(levels(as.factor(data[,item]))))
+    plot(dataPr_1[,"eta"],dataPr_1[,"esp"],col=c(1),type="l",xlab="eta",ylab="Expected value",ylim=c(y_inf,y_sup))
+    for(j in 2:n){
+      data = get(paste("dataPr",j,sep="_"))
+      lines(data[,"eta"],data[,"esp"],col=c(j))
+    }
+    legend("bottomright",legend=c(var_names),col=c(1:n),lty=rep(1,n),cex=0.6)
+    titre = paste("DIF-test for the item",item,sep=" ")
+    title(sub=titre)
+    
+    # we also want the likelihood ratio
+    cat(paste("For the item",item,sep=" "))
+    LRtest(fit0,fit1,display=TRUE)
+    print(parameters)
+    }
   if(toPlot==FALSE){
-    result = LRtest(fit0,fit1,display=FALSE)
-    rownames(result)=item
+    LRT = LRtest(fit0,fit1,display=FALSE)
+    rownames(LRT)=item
+    result=list("LRT"=LRT,"parameters"=parameters)
     return(result) # if we only want the p-value
   }
 }
@@ -233,21 +239,28 @@ difPolyTot = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
   options(show.error.messages = -1)
   len = length(items)
   if(toPlot==TRUE){
-  par(mfrow=selectPar(len))
-  for(i in 1:len){
-    tryCatch(difPoly(data,item=items[i],itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=TRUE),error=function(e) NA)
-    if(i<len){
-      invisible(readline(prompt="Press [enter] to continue"))}
-  }
-  }else{
-    result = data.frame("LRT"=c(0),"df"=c(0),"pvalue"=c(0))
+    par(mfrow=selectPar(len))
     for(i in 1:len){
-      result[i,] = tryCatch(difPoly(data,item=items[i],itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=FALSE),error=function(e) NA)   
-      }
-    rownames(result)=items
-    return(result)
+      tryCatch(difPoly(data,item=items[i],itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=TRUE),error=function(e) NA)
+      if(i<len){
+        invisible(readline(prompt="Press [enter] to continue"))}
     }
+  }else{
+    result_LRT = data.frame("LRT"=c(0),"df"=c(0),"pvalue"=c(0))
+    for(i in 1:len){
+      result_dif = tryCatch(difPoly(data,item=items[i],itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=FALSE),error=function(e) NA)   
+      if(is.na(dif_result)==FALSE){
+      result_LRT[i,] = result_dif[["LRT"]]
+      result_parameters = result_dif[["parameters"]]
+      }
+    }
+    rownames(result_LRT)=items
+    result = list("LRT"=result_LRT,"parameters"=result_parameters)
+    return(result)
+  }
 }
+
+
 
 
 #===================================================================================#
