@@ -463,43 +463,7 @@ simulation_1_diff_Tot = function(data,items,itemlist,constraint,B,scoreGrp,diffv
   }
   }
   
-  
-
-
-#===================================================================================#
-# some useful functions 
-
-# to select columns in a dataframe whom the name starts with expr
-selectItems = function(data,expr){
-  l = grep(paste(expr,"",sep=""), colnames(data))
-  return(l)
-}
-
-# to delete the columns with only NA values in a dataset
-selectNotNa = function(data){
-  # to delete the items with only NA answers (not relevant - means there were not used for the study)
-  data <- data[,colSums(is.na(data)) != nrow(data)]
-  return(data)
-}
-
-selectPar = function(n){
-  if(n <=3){
-    return(c(1,n))}
-  if(n == 4 ){
-    return(c(2,2))
-  }
-  if(n >4 & n <= 6){
-    return(c(2,3))  
-  }
-  if(n >6 & n <=9){
-    return(c(3,3))  
-  }
-  if(n > 9){
-    return(c(1,3))  
-  }
-}
-
-
+ 
 #===================================================================================#
 # to test how reliable an item is
 
@@ -579,6 +543,41 @@ selectAleat = function(data,refvar,n){
     data_t=rbind(data_t,get(var_names[i]))
   }
   return(data_t)  
+}
+
+                    
+
+#===================================================================================#
+# some useful functions 
+
+# to select columns in a dataframe whom the name starts with expr
+selectItems = function(data,expr){
+  l = grep(paste(expr,"",sep=""), colnames(data))
+  return(l)
+}
+
+# to delete the columns with only NA values in a dataset
+selectNotNa = function(data){
+  # to delete the items with only NA answers (not relevant - means there were not used for the study)
+  data <- data[,colSums(is.na(data)) != nrow(data)]
+  return(data)
+}
+
+selectPar = function(n){
+  if(n <=3){
+    return(c(1,n))}
+  if(n == 4 ){
+    return(c(2,2))
+  }
+  if(n >4 & n <= 6){
+    return(c(2,3))  
+  }
+  if(n >6 & n <=9){
+    return(c(3,3))  
+  }
+  if(n > 9){
+    return(c(1,3))  
+  }
 }
 
 
