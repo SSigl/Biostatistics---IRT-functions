@@ -29,8 +29,8 @@ study_3 = selectNotNa(study_3)
 study_4 = selectNotNa(study_4)
 study_5 = selectNotNa(study_5)
 
-dataList = list("study_1" = study_1,"study_2" =study_2,"study_3" =study_3,"study_4" =study_4,"study_5" =study_5)
-covariates = data.frame("study_1"=c("Sex","over64"),"study_2"=c("Sex","over48"),"study_3"=c("Sex","over72"),"study_4"=c("Sex","over76"),"study_5"=c("Sex","over51"))
+datalist = list("study_1" = study_1,"study_2" =study_2,"study_3" =study_3,"study_4" =study_4,"study_5" =study_5)
+covariables = data.frame("study_1"=c("Sex","over64"),"study_2"=c("Sex","over48"),"study_3"=c("Sex","over72"),"study_4"=c("Sex","over76"),"study_5"=c("Sex","over51"))
 
 # sub_scales
 healthBehaviour =paste("Heiq",c(1,9,13,19),sep="")
@@ -54,6 +54,9 @@ simulation_1_Tot(data=data,items=healthBehaviour,itemlist=healthBehaviour,
 
 simulation_1_diff_Tot(data=data,items=healthBehaviour,itemlist=healthBehaviour,
                       constraint="gpcm",B=10,scoreGrp=3,diffvar="Sex")
+
+testItem_Tot(dataList=datalist,item=healthBehaviour,itemlist=healthBehaviour,
+             covariates=covariables,constraint="gpcm",eps=0.05)
 
 
 
