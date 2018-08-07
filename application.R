@@ -1,8 +1,8 @@
 #===================================================================================#
 #                                                                                   #
-#          INTERNSHIP - MASTER I/II - BIOSTATISTICS - Work on the true database    #
+#          INTERNSHIP - MASTER I/II - BIOSTATISTICS - Work on the true database     #
 #                       Latent variables model - IRT - Rasch                        #
-#                                   S. SIGALLA                                      #
+#                                      S. SIGL                                      #
 #                                                                                   #
 #===================================================================================#
 
