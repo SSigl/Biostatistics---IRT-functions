@@ -34,11 +34,22 @@ This function will be used in several other functions and generally won't be use
 In the case of polytomous items, we cannot plot the probability of success as a function of the latent variable eta, as we can in the case of dichotomous items : we do not interpret the dichotomous and polytomous items the same way. However, we may plot the expected value of an item for a gpcm-model applied to a database with polytomous items. 
 
 To this end, we wrote the "esperance" function. This functions takes in argument one database ("data"), one item ("item"), one itemlist ("itemlist") and one constraint ("constraint"). The database is the database we extract the information we need from. We restrain this database to an itemlist to apply a gpcm model ("gpcm" stands for "generalized partial credit model"), which might be a 1PL or 2PL, according to the constraint we choose : 
-> if the constraint is "rasch", the discrimination parameter is assumed equal for all items and fixed to one ;
-> if the constraint is "1PL", the discrimination parameter is assumed equal for all items but is estimated ;
-> if the constraint is "gpcm", the discrimination parameters differ between the items and are estimated.
+-> if the constraint is "rasch", the discrimination parameter is assumed equal for all items and fixed to one ;
+-> if the constraint is "1PL", the discrimination parameter is assumed equal for all items but is estimated ;
+-> if the constraint is "gpcm", the discrimination parameters differ between the items and are estimated.
 For more details on the gpcm objects, we recommand the reading of the description of the "ltm" R-package.
-. The item is the item whom we wish to calculate the expected value. 
+
+The item is the item whom we wish to calculate the expected value. 
+
+The itemlist corresponds to the subscale the item belongs : when we apply the model, we restrain the studied dataset to this itemlist. 
+
+The constraint specifies the type of model we wish to apply, as we just detailed ; it may be equal to "rasch", "1PL" or "gpcm". 
+
+Now we may describe the running of the function :
+
+
+
+
 
 
 
