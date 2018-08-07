@@ -485,15 +485,7 @@ testItem = function(dataList,item,itemlist,covariates,constraint,eps){
     m= length(covar)
     for(j in 1:m){
     diffvar = covar[j]
-    #options(warn=-1) 
-    #options(show.error.messages = -1)
-    #result = try(difPoly(dataList[[study]],item=item,itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=FALSE),silent=TRUE)
     result = tryCatch(difPoly(dataList[[study]],item=item,itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=FALSE),error=function(e) NA)
-    #if(class(result)!="try-error"){
-    #data_int = data.frame("covar"=c(diffvar),"study"=c(study),"pvalue"=result[,"pvalue"])
-    #}else{
-    #data_int = data.frame("covar"=c(diffvar),"study"=c(study),"pvalue"="ERROR")  
-    #}
     if(is.na(result)){
       data_int = data.frame("covar"=c(diffvar),"study"=c(study),"pvalue"="ERROR")    
     }else{
@@ -507,7 +499,6 @@ testItem = function(dataList,item,itemlist,covariates,constraint,eps){
   resultItem$test[resultItem$pvalue=="ERROR"] <- "ERROR"
   return(resultItem)
 }
-
 
 testItem_Tot = function(dataList,items,itemlist,covariates,constraint,eps){
   result_Tot = list()
