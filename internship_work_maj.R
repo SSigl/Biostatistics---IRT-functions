@@ -39,7 +39,7 @@ LRtest = function(model0,model1,display){
   df <- nb1 - nb0
   LRT = -2*(L0[1]-L1[1])
   pvalue = round(1 - pchisq(LRT,df),digits=5)
-  result = data.frame("df"=c(df),"pvalue"=c(pvalue))
+  result = data.frame("LRT" =c(LRT), "df"=c(df),"pvalue"=c(pvalue))
   if(display==TRUE){
   text0 = "LR test :"
   text1 = paste("Log-likelihood ratio test",LRT,sep=":")
@@ -51,77 +51,6 @@ LRtest = function(model0,model1,display){
   cat("\n")}
   else{return(result)}
 }
-
-# NB : this function may only be used for gpcm objects
-splitFct = function(data,item,itemlist,diffvar,constraint,toPlot){
-  if(class(item)!="character"){
-  item = colnames(data)[item]}
-  # levels of the diff variable
-  level = as.numeric(levels(as.factor(data[,c(diffvar)])))
-  # number of levels
-  n = length(level) 
-  # number of columns of the complete database
-  m = dim(data)[2] 
-  # empty vector which will countain the names of the new variables for the suspected item by level
-  var_names = c()
-  
-  # we create the names of the variables and the variables themselves
-  for(i in 1:n){
-    var_names[i] = paste(item,i,sep="_")
-    data$var <- data[,c(item)]
-    data$var[data[,c(diffvar)] != level[i]] <- NA 
-    colnames(data)[colnames(data)=="var"] <- var_names[i]
-  }
-  
-  # we run the "original" model, so we can compare likelihood ratio
-  it0 <- data[,c(itemlist)]
-  # we remove the suspected item from the itemlist (it is easier to proceed that way)
-  k_1 = which(colnames(data)==item)
-  k_1 = which(itemlist==k_1)
-  itemlist = itemlist[-k_1]
-  # we add the new created items : (m+1):(m+n)
-  it1 <- data[,c(itemlist,(m+1):(m+n))]
-  # models
-  fit0 <- gpcm(it0,constraint = constraint)
-  fit1 <- gpcm(it1,constraint=constraint)
-  
-  if(toPlot == TRUE){
-  # we consider the variables whom the name starts with the name of the suspected item
-  # i.e. all new created variables
-  l = grep(paste(item,"",sep="_"), colnames(it1))
-  
-  # we plot 
-  v1 <- plot(fit1, items= l, plot=FALSE,xlim=c(-4,4))
-  eta = v1$z
-  plot(eta,v1$pr[[var_names[1]]][,2],col=c(1),type="l",xlab="eta",ylab="P(y=1|eta)",ylim=c(0,1))
-  for(i in 2:n){
-    lines(eta,v1$pr[[var_names[i]]][,2],col=c(i))
-  }
-  legend("topleft",legend=c(var_names),col=c(1:n),lty=rep(1,n))
-  titre = paste("DIF-test for the item",item,sep=" ")
-  title(sub=titre)
-  
-  # we also want the likelihood ratio
-  cat(paste("For the item",item,sep=" "))
-  LRtest(fit0,fit1,display=TRUE)}else{
-    return(LRtest(fit0,fit1,display=FALSE))
-    
-  }
-}
-
-# now we use this first function which only worked for one item, and we apply it for a list of suspected items
-splitTot = function(data,items,itemlist,diffvar,constraint){
-  len = length(items)
-  par(mfrow=selectPar(len))
-  for(i in 1:len){
-    splitFct(data,item = items[i],itemlist,diffvar,constraint)
-    if(i<len){
-    invisible(readline(prompt="Press [enter] to continue"))}
-  }
-}
-
-#splitTot(AMTS,items = c(1,4,7),itemlist=c(1:10),diffvar="agegrp",constraint="rasch")
-#par(mfrow=c(1,1))
 
 #===================================================================================#
 # polytomous items
@@ -219,7 +148,7 @@ regroupe = function(data,item,diffvar){
 
 
 # same function as previously for split but for polytomous item
-difPoly = function(data,item,itemlist,diffvar,constraint,toPlot){
+difPoly = function(data,item,itemlist,diffvar,constraint,toPlot=FALSE){
   data = subset(data,is.na(data[,diffvar])==FALSE)
   data = regroupe(data,item,diffvar) 
   if(class(item)!="character"){
@@ -275,12 +204,13 @@ difPoly = function(data,item,itemlist,diffvar,constraint,toPlot){
     assign(paste("dataPr",k,sep="_"),esperance(data=it1,item=c(j),itemlist=itemlist,constraint))
   }
   y_sup = max(as.integer(levels(as.factor(data[,item]))))
-  plot(dataPr_1[,"eta"],dataPr_1[,"esp"],col=c(1),type="l",xlab="eta",ylab="Expected value",ylim=c(0,y_sup))
+  y_inf = min(as.integer(levels(as.factor(data[,item]))))
+  plot(dataPr_1[,"eta"],dataPr_1[,"esp"],col=c(1),type="l",xlab="eta",ylab="Expected value",ylim=c(y_inf,y_sup))
   for(j in 2:n){
     data = get(paste("dataPr",j,sep="_"))
     lines(data[,"eta"],data[,"esp"],col=c(j))
   }
-  legend("bottomright",legend=c(var_names),col=c(1:n),lty=rep(1,n))
+  legend("bottomright",legend=c(var_names),col=c(1:n),lty=rep(1,n),cex=0.6)
   titre = paste("DIF-test for the item",item,sep=" ")
   title(sub=titre)
   
@@ -294,39 +224,27 @@ difPoly = function(data,item,itemlist,diffvar,constraint,toPlot){
   }
 }
 
-# same as before, we now want to directly apply the function on a list of suspected items
-difPolyTot = function(data,items,itemlist,diffvar,constraint,toPlot){
+# we now want to directly apply the function on a list of suspected items
+difPolyTot = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
+  options(warn=-1) 
+  options(show.error.messages = -1)
   len = length(items)
   if(toPlot==TRUE){
   par(mfrow=selectPar(len))
   for(i in 1:len){
-    difPoly(data,item = items[i],itemlist,diffvar,constraint,toPlot)
+    tryCatch(difPoly(data,item=items[i],itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=TRUE),error=function(e) NA)
     if(i<len){
       invisible(readline(prompt="Press [enter] to continue"))}
   }
   }else{
-    result = data.frame("df"=c(0),"pvalue"=c(0))
+    result = data.frame("LRT"=c(0),"df"=c(0),"pvalue"=c(0))
     for(i in 1:len){
-      result[i,] = difPoly(data,item = items[i],itemlist,diffvar,constraint,toPlot)
-    }
+      result[i,] = tryCatch(difPoly(data,item=items[i],itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=FALSE),error=function(e) NA)   
+      }
     rownames(result)=items
     return(result)
     }
 }
-
-# if we want to export each plot automatically
-difPolyTotAutoPlot = function(data,items,itemlist,diffvar,constraint,path){
-  len = length(items)
-  for(i in 1:len){
-    mypath <- file.path(path,paste(paste(items[i], diffvar, sep = "_"),".jpg",sep=""))
-    jpeg(file=mypath)
-    difPoly(data,item = items[i],itemlist,diffvar,constraint)
-    dev.off()
-    #if(i<len){
-    #  invisible(readline(prompt="Press [enter] to continue"))}
-  }
-}
-
 
 
 #===================================================================================#
@@ -337,14 +255,18 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
     item = colnames(data)[item]}
   if(class(itemlist)!="character"){
   itemlist = colnames(data)[itemlist]}
+  # we need to restraint the dataset on the subscale we're interested in (otherwise it does not make sense)
+  data <- data[,c(itemlist)] 
   # first, we create the score column (for the itemlist)
   data$score <- apply(subset(data,select=itemlist),1,sum,na.rm = TRUE)
   # scoreGrp is an option to "gather" some score categories so we have
   # enough people in each category 
   # scoreGrp specifies how many categories we wish to create apart from the score
   if(scoreGrp >1){
-  data$score <- cut(data$score,breaks=scoreGrp,labels=FALSE)
-  }
+    # we divide the data$score so to get a number of scoreGrp same-sized categories
+    quantiles = as.numeric(quantile(data$score,probs=0:scoreGrp/scoreGrp))
+    data$score <- quantcut(data$score,q=scoreGrp,na.rm=TRUE,labels=1:scoreGrp)
+    }
   R = as.integer(levels(factor(data$score)))
   # for the item we're interested in, we are going to create a data.frame with,
   # for everey corresponding score, the sum for all persons of the value of the item
@@ -449,9 +371,9 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
         simul_data[i,k] <- values[which(as.data.frame(rmultinom(n=1,size=1,prob))==1)]
       }
     }
-    simul_data$score <- apply(simul_data,1,sum)  
+    simul_data$score <- apply(simul_data,1,sum)
     if(scoreGrp >1){
-      simul_data$score <- cut(simul_data$score,breaks=scoreGrp,labels=FALSE)
+      simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)
     }
     
     # now we may as previously compute the mean for each level of the score
@@ -470,8 +392,9 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
     lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
   }
   lines(tab$level_R,tab$S,col="blue",lwd=3)
+  legend("bottomright",legend=c("real score","sim score"),col=c("blue","red"),lty=c(1,3),cex=0.6)
 }
-
+                            
 # now, we want to add a split option according to a differenciation variable diffvar
 # for that, we need a very simple differenciation function 
 
