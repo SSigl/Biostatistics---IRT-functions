@@ -10,26 +10,31 @@
 # the environnment
 
 #%%%%%%%%%%%%%%
-
 #   packages
-#rm(list = ls())
+rm(list = ls())
 
 #install.packages("eRm",repos="http://cran.rstudio.com/")
-#library(eRm)
+library(eRm)
 
 #install.packages("sirt", repos="http://cran.rstudio.com/") #pour tester dépendance locale
-#library(sirt)
+library(sirt)
 
 #install.packages("ltm", repos="http://cran.rstudio.com/")
-#library(ltm)
+library(ltm)
 
 #install.packages("mirt", repos="http://cran.rstudio.com/")
-#library(mirt)
+library(mirt)
 
+#install.packages("car") # useful to recode
+library(car)
+
+#install.packages("rlist") # to use the list.append() function
+library(rlist)
+
+#install.packages("gtools") # useful to sort some list
+library(gtools)
 
 #===================================================================================#
-# first database : dichotomous items
-
 # function to lead a likelihood ratio test
 LRtest = function(model0,model1,display){
   L0 <- logLik(model0)
