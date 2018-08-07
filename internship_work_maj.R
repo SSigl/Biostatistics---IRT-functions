@@ -278,7 +278,7 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
     data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
     tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
   }
-  plot(tab$level_R,tab$S,type="l",xlab="score",main=paste("Score for the item",item,sep=" "),col="blue")
+  plot(tab$level_R,tab$S,type="l",xlab="score",ylab="sucess rate",main=paste("Score for the item",item,sep=" "),col="blue")
   # we note we do not obtain a monotonic function for each item
   
   # we calculate the gpcm-fit object corresponding to our data
