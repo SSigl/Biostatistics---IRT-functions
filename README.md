@@ -43,13 +43,26 @@ To this end, we wrote the "esperance" function. This functions takes in argument
 
 For more details on the gpcm objects, we recommand the reading of the description of the "ltm" R-package.
 
-The item is the item whom we wish to calculate the expected value. 
-
-The itemlist corresponds to the subscale the item belongs : when we apply the model, we restrain the studied dataset to this itemlist. 
-
-The constraint specifies the type of model we wish to apply, as we just detailed ; it may be equal to "rasch", "1PL" or "gpcm". 
+The item is the item whom we wish to calculate the expected value. The itemlist corresponds to the subscale the item belongs : when we apply the model, we restrain the studied dataset to this itemlist. The constraint specifies the type of model we wish to apply, as we just detailed ; it may be equal to "rasch", "1PL" or "gpcm". 
 
 Now we may describe the running of the function :
+
+- first, we apply the model to the restrained database ; from this model, we extract the possible values of eta (the latent variable we're interested in) ;
+- we then extract (still from the model), for every possible value taken by the polytomous item (for example 1, 2, 3, 4, 5), the probability that the item is equal to each value (for example, the probability that the item would be equal to 1, 2, etc) ; with all these probabilities, we may then calculate the expected value.
+
+The function returns a vector of two columns : the value of eta and, for each one, the corresponding expected value. 
+
+This function is an "intermediary function" : we use it in the "difPoly" function to plot the expected value. 
+
+# To regroupe some values of a variable when we wish to split this variable according to a differentiating variable : "regroupe" (intermediary function)
+
+"regroupe" means "regathering".
+
+As we previously said (in the description of the LRT function), we have to test DIF on the items of the studied database. For this, we have to split each item according to a covariate, the differentiating variable. From the DIF-suspected item and the covariate, we create new items : one for each level of the covariate, equal to the original item when the covariate values the studied level, and equal to NA otherwise. When we do this, there is a risk that the newly-created items do not take all the same values. We take the same example again : suppose we suspect item1 to be a DIF for the covariate "Sex". "Sex" takes only two values : 1 (men) and 2 (women). We then create the variables "item1_1" (for men) and "item1_2" (for women). The variable "item1_1" is equal to the variable "item1" when "Sex" is equal to 1 ("men"), otherwise "item1_1" is equal to NA ; similarly, the variable "item1_2" is equal to the variable "item1" when "Sex" is equal to 2 ("women") ; otherwise "item1_2" is equal to NA.
+Now, suppose item1 has 4 possible values : 1, 2, 3, 4. We might have to face the following situation : item1_1 taking all 4 possible values (1, 2, 3, 4) and item1_2 taking only 3 possibles values (2, 3, 4). This might happen if the value "1" is initially rare. 
+This is problematic if we wish to plot and compare the expected values of the newly-created items. 
+
+In order to avoid that, the "regroupe" function gathers the possible values of the studied item so that the items created from a differentiating variable do take the same values. 
 
 
 
