@@ -270,7 +270,7 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
   if(class(item)!="character"){
     item = colnames(data)[item]}
   if(class(itemlist)!="character"){
-  itemlist = colnames(data)[itemlist]}
+    itemlist = colnames(data)[itemlist]}
   # we need to restraint the dataset on the subscale we're interested in (otherwise it does not make sense)
   data <- data[,c(itemlist)] 
   # first, we create the score column (for the itemlist)
@@ -282,7 +282,7 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
     # we divide the data$score so to get a number of scoreGrp same-sized categories
     quantiles = as.numeric(quantile(data$score,probs=0:scoreGrp/scoreGrp))
     data$score <- quantcut(data$score,q=scoreGrp,na.rm=TRUE,labels=1:scoreGrp)
-    }
+  }
   R = as.integer(levels(factor(data$score)))
   # for the item we're interested in, we are going to create a data.frame with,
   # for everey corresponding score, the sum for all persons of the value of the item
@@ -294,7 +294,10 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
     data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
     tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
   }
-  plot(tab$level_R,tab$S,type="l",xlab="score",ylab="sucess rate",main=paste("Score for the item",item,sep=" "),col="blue")
+  y_inf = min(data[,itemlist],na.rm=TRUE)
+  y_sup = max(data[,itemlist],na.rm=TRUE)
+  if(scoreGrp>1){x_lab="regathered score"}else{x_lab = "score"}
+  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Score for the item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
   # we note we do not obtain a monotonic function for each item
   
   # we calculate the gpcm-fit object corresponding to our data
@@ -313,8 +316,8 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
       for(j in 1:(k-1)){
         persons[p+1,] = persons[i,]
         p = p+1
-        }
-        }
+      }
+    }
   }
   N = dim(persons)[1]
   q = length(itemlist)
@@ -351,7 +354,7 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
       for(j in 1:(n-1)){
         beta_j = parameters[paste("Catgr",j,sep="."),]
         eta=c(eta,eta[j]-beta_j)
-        }
+      }
       quotient = 0
       for(j in 1:n){
         quotient = quotient + exp(alpha*(values[j]*data_B$z1+eta[j]))
@@ -414,7 +417,7 @@ simulation_1 = function(data,item,itemlist,constraint,B,scoreGrp){
 
 # same as before, we now want to directly apply the function on a list of items
 simulation_1_Tot = function(data,items,itemlist,constraint,B,scoreGrp)
-  {
+{
   len = length(items)
   par(mfrow=selectPar(len))
   for(i in 1:len){
@@ -438,47 +441,251 @@ diff_fct = function(data,item,diffvar){
   # number of columns of the complete database
   m = dim(data)[2] 
   # empty vector which will countain the names of the new variables for the item we wish to differenciate by level
-  var_names = c()
+  diff_names = c()
   
   # we create the names of the variables and the variables themselves
   for(i in 1:n){
-    var_names[i] = paste(item,level[i],sep="_")
+    diff_names[i] = paste(item,level[i],sep="_")
     data$var <- data[,c(item)]
     data$var[data[,c(diffvar)] != level[i]] <- NA 
-    colnames(data)[colnames(data)=="var"] <- var_names[i]
+    colnames(data)[colnames(data)=="var"] <- diff_names[i]
   }
   
-  result = list("data"=data,"var_names"=var_names)
+  result = list("data"=data,"diff_names"=diff_names)
   return(result)
 }
 
+# for diff items :
+
+simulation_2 = function(data,item,itemlist,diff_names,constraint,B,scoreGrp){
+  if(class(item)!="character"){
+    item = colnames(data)[item]}
+  if(class(itemlist)!="character"){
+    itemlist = colnames(data)[itemlist]}
+  # itemlist + differenciated items :  
+  tot_list <- c(itemlist,diff_names)  
+  # we need to restraint the dataset on the subscale we're interested in (otherwise it does not make sense)
+  data = subset(data,select=c(tot_list))
+  # first, we create the score column (for the itemlist)
+  data$score <- apply(subset(data,select=tot_list),1,sum,na.rm = TRUE)
+  # scoreGrp is an option to "gather" some score categories so we have
+  # enough people in each category 
+  # scoreGrp specifies how many categories we wish to create apart from the score
+  if(scoreGrp >1){
+    # we divide the data$score so to get a number of scoreGrp same-sized categories
+    quantiles = as.numeric(quantile(data$score,probs=0:scoreGrp/scoreGrp))
+    data$score <- quantcut(data$score,q=scoreGrp,na.rm=TRUE,labels=1:scoreGrp)
+  }
+  R = as.integer(levels(factor(data$score)))
+  # for the item we're interested in, we are going to create a data.frame with,
+  # for everey corresponding score, the sum for all persons of the value of the item
+  # when the score is equal to the corresponding score
+  tab = data.frame(level_R=R,S = rep(0,length(R)))
+  # we go over every possible value of R
+  for(i in 1:length(R)){
+    # we considerer the restrained database of the initial data, for every score value equal to the value of R we consider
+    data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
+    tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
+  }
+  y_inf = min(data[,tot_list],na.rm=TRUE)
+  y_sup = max(data[, tot_list],na.rm=TRUE)
+  if(scoreGrp>1){x_lab="regathered score"}else{x_lab = "score"}
+  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Score for the item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
+  # we note we do not obtain a monotonic function for each item
+  
+  # we calculate the gpcm-fit object corresponding to our data
+  fit = gpcm(data[,c(tot_list)],constraint=constraint)
+  coef = coef(fit)
+  persons = data.frame(factor.scores(fit)$score.dat)
+  # rq : "persons" and "data" are of different size because some lines are duplicated
+  # there is a probleme if we consider that the persons who are repeated
+  # should normally have a higher probability of being selected
+  # so we have to replicate the lines if obs > 1
+  N = dim(persons)[1]
+  p = N
+  for(i in 1:N){
+    k = persons[i,"Obs"]
+    if(k>1){
+      for(j in 1:(k-1)){
+        persons[p+1,] = persons[i,]
+        p = p+1
+      }
+    }
+  }
+  N = dim(persons)[1]
+  q = length(itemlist)+1
+  
+  
+  # now we do B boostrap simulations using the gpcm fit object
+  for(b in 1:B){
+    # boostrap : we sample 
+    # subtility here : we must sample by category of the initial diff variable (which corresponds to the number of differenciated variables)
+    diff_n = length(diff_names)
+    # this vector will countain the names of the databases we sample from the persons database for each value of the initial diffvar
+    data_names = c()
+    # this vector will later countain the names of the simulated datasets pour each possible value of the diff variable
+    simul_names = c()
+    for(i in 1:diff_n){
+      data_names[i]=paste("data_B",diff_names[i],sep="_")
+      simul_names[i] = paste("simul",diff_names[i],sep="_")
+      data_B = subset(persons,is.na(persons[,diff_names[i]])==FALSE)
+      N = dim(data_B)[1]
+      data_B = data_B[sample(nrow(data_B),size=N,replace=TRUE),]
+      data_B = subset(data_B,select=c("z1"))
+      # in order to avoid any index problem :
+      rownames(data_B) <- NULL	
+      assign(data_names[i], data_B) 
+    }
+    # we calculate, for each person location, the probability P(Xiv=x|theta) for x =0,1,2,... (possible levels of each item)
+    for(l in 1:diff_n){
+      for(k in 1:q){
+        tot_list <- c(itemlist,diff_names[l])
+        item_B = tot_list[k]
+        values = as.integer(levels(factor(data[,item_B])))
+        n = length(values)
+        # parameters :
+        parameters = as.data.frame(coef[item_B,])
+        # we add the corresponding parameter for the lowest value's category (which is set to 0 - convention)
+        parameters["Catgr.0",] <-0
+        # we simply sort the dataframe by the name of the row (it may avoid technical problems in what follows)
+        parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
+        colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
+        # empty vector which will countain the names of the calculated probabilities for each possible value of the item
+        var_names = c()
+        
+        #before, we calculate useful entities
+        # discriminatino parameter
+        alpha = parameters["Dscrmn",]
+        # required parameters :
+        eta = c=("eta"=c(0))
+        for(j in 1:(n-1)){
+          beta_j = parameters[paste("Catgr",j,sep="."),]
+          eta=c(eta,eta[j]-beta_j)
+        }
+        quotient = 0
+        for(j in 1:n){
+          quotient = quotient + exp(alpha*(values[j]*get(data_names[l])[,"z1"]+eta[j]))
+        }
+        quotient <- 1/quotient
+        
+        # we use a "transition database" because it is easier to manipulate
+        data_B = get(data_names[l])
+        # we now create the names of the variables and the variables themselves
+        for(j in 1:n){
+          var_names[j] = paste("proba",item_B,values[j],sep="_")
+          
+          # we select the good parameters
+          eta_j = eta[j]
+          h=values[j]
+          
+          # we calculate the corresponding probability
+          data_B$var <- exp(alpha*(h*data_B$z1+eta_j))*quotient
+          colnames(data_B)[colnames(data_B)=="var"] <- var_names[j]
+        }
+        # we finally assign the new base 
+        assign(data_names[l],data_B)
+      }
+    }
+    
+    for(l in 1:diff_n){
+      tot_list <- c(itemlist,diff_names[l])
+      # as before, we use a "transition dataset"
+      data_B = get(data_names[l])
+      # now we simulate an item-dataset, by using a multinomial law
+      simul_data = data[1,tot_list]
+      N= dim(get(data_names[l]))[1]
+      for(i in 1:N){
+        for(k in 1:q){
+          item_B = tot_list[k]
+          values = as.integer(levels(factor(data[,item_B])))
+          n = length(values)
+          var_names = c()
+          for(j in 1:n){
+            var_names[j] = paste("proba",item_B,values[j],sep="_")
+          }
+          prob = data_B[i,var_names]
+          simul_data[i,k] <- values[which(as.data.frame(rmultinom(n=1,size=1,prob))==1)]
+        }
+      }
+      for(m in 1:diff_n){
+        if(m !=l){
+          simul_data$var <- NA
+          colnames(simul_data)[colnames(simul_data)=="var"] <- diff_names[m]
+          assign(simul_names[l],simul_data)
+        }
+      }
+    }
+    
+    # finally, we can merge the simulated datasets we obtained
+    simul_data = get(simul_names[1])
+    for(l in 2:diff_n){
+      simul_data <- rbind(simul_data,get(simul_names[l]))
+    }
+    
+    
+    simul_data$score <- apply(simul_data,1,sum,na.rm=TRUE)
+    if(scoreGrp >1){
+      simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)
+    }
+    
+    # now we may as previously compute the mean for each level of the score
+    R = as.integer(levels(factor(simul_data$score)))
+    # for the item we're interested in, we are going to create a data.frame with,
+    # for everey corresponding score, the sum for all persons of the value of the item
+    # when the score is equal to the corresponding score
+    tab_b = data.frame(level_R=R,S = rep(0,length(R)))
+    # we go over every value of R
+    for(i in 1:length(R)){
+      # we considerer the restrained database of the initial data, for every score value equal to the value of R we consider
+      data_r = subset(simul_data,simul_data$score == as.numeric(R[i]) & is.na(simul_data[,item])==FALSE,select=item)
+      tab_b[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
+    }
+    # we may finally plot the result
+    lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
+  }
+  lines(tab$level_R,tab$S,col="blue",lwd=3)
+  legend("bottomright",legend=c("real score","sim score"),col=c("blue","red"),lty=c(1,3),cex=0.6)
+}
+                            
+
 # now we want a diff option
-simulation_1_diff = function(data,item,itemlist,constraint,B,scoreGrp,diffvar){
+simulation_diff = function(data,item,itemlist,constraint,B,scoreGrp,diffvar){
   result = diff_fct(data,item,diffvar)
   data = result$data
-  var_names = result$var_names
-  len = length(var_names)
+  diff_names = result$diff_names
+  len = length(diff_names)
   par(mfrow=selectPar(len+1))
   # first, we do the simulation for the splited item 
   simulation_1(data=data,item,itemlist=itemlist,constraint=constraint,B=B,scoreGrp=scoreGrp)
   # now, we change itemlist
   k = which(itemlist == item)
   itemlist = itemlist[-k]
-  itemlist = c(itemlist, var_names)
   for(i in 1:len){
-    simulation_1(data=data,item=var_names[i],itemlist=itemlist,constraint=constraint,B=B,scoreGrp=scoreGrp)
+    simulation_2(data=data,item=diff_names[i],itemlist=itemlist,diff_names=diff_names,constraint=constraint,B=B,scoreGrp=scoreGrp)
   }
 }
 
-simulation_1_diff_Tot = function(data,items,itemlist,constraint,B,scoreGrp,diffvar){
+simulation_diff_Tot = function(data,items,itemlist,constraint,B,scoreGrp,diffvar){
   len = length(items)
   for(i in 1:len){
-    simulation_1_diff(data,items[i],itemlist,constraint,B,scoreGrp,diffvar)
+    simulation_diff(data,items[i],itemlist,constraint,B,scoreGrp,diffvar)
     if(i<len){
       invisible(readline(prompt="Press [enter] to continue"))}
   }
-  }
-  
+}
+                            
+# we now do a function which incorporates the previous functions
+# so we may use one function for every case
+
+simulation = function(data,items,itemlist,constraint,B,scoreGrp,diffvar=NULL){
+  if(is.null(diffvar)==FALSE){
+    simulation_diff_Tot(data,items,itemlist,constraint,B,scoreGrp,diffvar)
+  }else{
+    simulation_1_Tot(data,items,itemlist,constraint,B,scoreGrp)  
+    }
+}
+
+                             
  
 #===================================================================================#
 # to test how reliable an item is
@@ -586,6 +793,38 @@ selectPar = function(n){
     return(c(1,3))  
   }
 }
+                      
+#===================================================================================#
+# importation of the dataset
+setwd("your_path")
+data <- read.csv("heiq.csv")
+
+# creation and transformation of the databases
+study_1 <- subset(data,data$study==1)
+study_2 <- subset(data,data$study==2)
+study_3 <- subset(data,data$study==3)
+study_4 <- subset(data,data$study==4)
+study_5 <- subset(data,data$study==5)
+
+
+study_1 = selectNotNa(study_1)
+study_2 = selectNotNa(study_2)
+study_3 = selectNotNa(study_3)
+study_4 = selectNotNa(study_4)
+study_5 = selectNotNa(study_5)
+
+datalist = list("study_1" = study_1,"study_2" =study_2,"study_3" =study_3,"study_4" =study_4,"study_5" =study_5)
+covariables = data.frame("study_1"=c("Sex","over64"),"study_2"=c("Sex","over48"),"study_3"=c("Sex","over72"),"study_4"=c("Sex","over76"),"study_5"=c("Sex","over51"))
+
+# sub_scales
+healthBehaviour =paste("Heiq",c(1,9,13,19),sep="")
+engagementLife = paste("Heiq",c(2,5,8,10,15),sep="")
+emotionWellbeing = paste("Heiq",c(4,7,12,14,18,21),sep="")
+selfMonitoring = paste("Heiq",c(3,6,11,16,17,20),sep="")
+beingConstructive = paste("Heiq",c(27,34,36,39,40),sep="")
+skillAcquisition = paste("Heiq",c(23,25,26,30),sep="")
+socialIntegration = paste("Heiq",c(22,28,31,35,37),sep="")
+healthNavigation = paste("Heiq",c(24,29,32,33,38),sep="")                      
 
 
 
