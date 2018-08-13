@@ -614,7 +614,7 @@ simulation_4 = function(data,items,itemlist,constraint,B,sc_gp,diffvar){
   par(mfrow=select_par(len))
   for(i in 1:len){
     simulation_4_int(data,items[i],itemlist,constraint,B,sc_gp,diffvar)
-    if(i<len){
+    if(i<len & len > 9){
       invisible(readline(prompt="Press [enter] to continue"))}
   }
 }
