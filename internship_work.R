@@ -147,12 +147,13 @@ dif_poly_int = function(data,item,itemlist,diffvar,constraint,toPlot=FALSE){
   result = differenciate(data,item,diffvar)
   data = result$data
   var_names = result$diff_names
+  n=length(var_names)
   # model with original item
   fit0 = gpcm(data[,c(itemlist)],constraint=constraint)
   # model with differenciated items
   difflist = c(itemlist[-which(itemlist==item)],var_names)
   fit1 = gpcm(data[,c(difflist)],constraint=constraint)
-  parameters = fit1$coefficients
+  parameters = as.data.frame(fit1$coefficients)
   
   # with or without plot
   if(toPlot==TRUE){
@@ -184,7 +185,7 @@ dif_poly_int = function(data,item,itemlist,diffvar,constraint,toPlot=FALSE){
 
 dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
   len = length(items)
-  if(toPlot==TRUE){
+  if(toPlot){
     par(mfrow=select_par(len))
     options(warn=-1) 
     for(i in 1:len){
@@ -195,18 +196,17 @@ dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
     options(warn=1) 
   }else{
     result_LRT = data.frame("LRT"=c(0),"df"=c(0),"pvalue"=c(0))
-    result_parameters = as.array(paste("result_parameters",items,sep="_"))
+    result_parameters = list()
     options(warn=-1) 
     for(i in 1:len){
       result_dif = tryCatch(dif_poly_int(data,item=items[i],itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=FALSE),error=function(e) NA)   
       if(is.na(result_dif)==FALSE){
         result_LRT[i,] = result_dif[["LRT"]]
-        assign(result_parameters[i],result_dif[["parameters"]])
+        result_parameters = append(result_parameters,list(result_dif[["parameters"]]))
       }
     }
-    result_parameters = apply(result_parameters,1,FUN=get)
-    names(result_parameters) <- items
     options(warn=-1) 
+    names(result_parameters) = items
     rownames(result_LRT)=items
     result = list("LRT"=result_LRT,"parameters"=result_parameters)
     return(result)
