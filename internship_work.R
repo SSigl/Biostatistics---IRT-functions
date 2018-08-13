@@ -606,7 +606,7 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp,diffvar){
   legend = paste(c("real rate for item","sim rate for item"),all_items[1],sep=" ")
   legend = c(legend,paste("real rate for item",diff_names,sep=" "))
   list_colors = c("blue","red",list_colors[1:len])
-  legend("bottomright",legend=legend,col=list_colors,lty=c(1,3,rep(1,len)),cex=0.6)
+  legend("bottomright",legend=legend,col=list_colors,lty=c(1,3,rep(1,len)),cex=0.5)
 }
 
 simulation_4 = function(data,items,itemlist,constraint,B,sc_gp,diffvar){
