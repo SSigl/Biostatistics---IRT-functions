@@ -97,17 +97,32 @@ Now, we wish to test DIF on the items of a order polytomous items database, acco
 We now describe the running of the function :
 
 - "initializing - create differenciate variables" :
-first, we apply the intermediary function "differenciate" to add to "data" the differenciated items created from "item" and "diffvar" ; we then create two models : "fit0" is the model applied to the itemlist (so with the original item "item") and "fit1" is the model applied to the itemlist without the original item, to which we add the newly-differenciated items ("difflist") ; we save the item parameters of "fit1" ; 
+first, we apply the intermediary function "differenciate" to add to "data" the differenciated items created from "item" and "diffvar" ; we then create two models : "fit0" is the model applied to the itemlist (so with the original item "item") and "fit1" is the model applied to the itemlist without the original item, to which we add the newly-differenciated items ("difflist") ; we save the item parameters of "fit1" in a dataframe ; 
 - "with or without plot" :
 if "toPlot" is equal to TRUE, we calculate the expected value for the differenciated items, calling the "expected_value" function ; we then display the plots in the same graph ; in addition to that, we display the result of the log-likelihood ratio test by calling the "LR_test" function and we return the item parameters of the model with the differenciated items that we saved earler ; if "toPlot" is equal to FALSE, we return a list of two elements : the "LR_test" result and the item parameters we previously saved. 
 
 
-Now, we generally wish to test DIF on a list of items, not on a single item. For this, we use a second function, "dif_poly". This function has the same arguments as the "dif_poly_int" function, except for "item", which is replaced by "items" : "items" must be a vector of items (a vector of character string). We then apply the dif_poly_int function for each item of the "items" list :
+Now, we generally wish to test DIF not on a single item on a list of items. For this, we use a second function, "dif_poly". This function has the same arguments as the "dif_poly_int" function, except for "item", which is replaced by "items" : "items" must be a vector of items (a vector of character strings). We then apply the dif_poly_int function for each item of the "items" list :
 
-- if "toPlot" is equal to TRUE, the function will display all plots one by one and at the same time the LRT result and the parameters of the model with the differenciated items, for each item of the "items" list ; 
-- if "toPlot" is equal to FALSE which is the by default value), the function will return a 
+- if "toPlot" is equal to TRUE, the function will display all plots one by one and, at the same time,for each item of the "items" list, the LRT result and the parameters of the model with the differenciated items ; 
+- if "toPlot" is equal to FALSE (which is the by default value), the function will return a list of two elements : a dataframe including the results of the LRT test for all items in "items" list and a list of dataframes, one for each item in the "items" list, including the parameters of the model applied on the differenciated items. 
+
+The reader should note that it might happen that the dif_poly_int function returns an error because of convergence's problems of the model. This is a problem if we wish to apply the "dif_poly" function on a list of several items because it might interrupt the process : to avoid this, we use "tryCatch" on "dif_poly_int" so that if the "dif_poly_int" returns no result, the loop does pass to the next item in the "items" list. 
+
+This "dif_poly" function may be used for only one item in the "items" argument, so we will not use the "dif_poly_int" function, which is only an intermediary function useful in the "dif_poly" function.
 
 
+# To check whether the model is well-adjusted to our data : "simulation_1_int" (intermediary function) and "simulation_1"
+
+When we apply a gpcm model on a polytomous dataframe, we wish to perform simulations in order to check the model's adequation to the data. For this, we wrote several functions. First, the most basic ones we use are "simulation_1_int" and "simulation_1". The idea is the following : for an item in a subscale, we plot the success rate of this items in function of the real total score obtained by the test-takers ; we apply the gpcm-model and we extract the persons parameters and the parameters of the studied item ; we then sample the persons locations (bootstrap) and from the model parameters, we simulate a polytomous responses dataset ; we may then calculate the simulated score and plot it in the same graph as the first plot. We repeat the sampling several times to see, for the studied item, how similar the simulated success rates are from the real sucess rate. 
+
+The intermediary function "simulation_1_int" takes in argument :
+> the studied dataframe "data" ;
+> "item", the item whom we shall trace the success rate according to the total score ; let's take an example : we wish to know the sucess rate of item n°3 depending on the total score of the test-takers, which is between 0 and 10 ; then, for each possible value of the score (0, 1, 2, etc), we calculate the mean of the item n°3 on all persons who obtained this possible value of the score ; so, we first restrain the database to the persons who had a total score of 0 and we calculate the mean of the item n°3, then we do the same with the persons who had a total score of 1, etc ; we then obtain for each possible value of the score the corresponding mean of the item, which we call "sucess rate" (the idea is pretty much the same), and we may plot this item sucess rate in function of the score ; "item" must be a character string ;
+> "itemlist", the list of items on which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
+> "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+> "B" for "bootstrap", which is the number of simulations we wish to lead ;
+> "sc_gp" for "score group" :
 
 
 
