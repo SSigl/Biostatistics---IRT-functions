@@ -217,7 +217,7 @@ dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
 
 
 #===================================================================================#
-simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp){
+simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1){
   # initialiazing -- creation of score -- re-level score
   data <- data[,c(itemlist)] 
   data$score <- apply(data,1,sum,na.rm = TRUE)
@@ -304,7 +304,7 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp){
   legend("bottomright",legend=c("real success rate","sim success rate"),col=c("blue","red"),lty=c(1,3),cex=0.6)
 }
 
-simulation_1 = function(data,items,itemlist,constraint,B,sc_gp){  
+simulation_1 = function(data,items,itemlist,constraint,B,sc_gp=1){  
   len = length(items)
   par(mfrow=select_par(len))
   for(i in 1:len){
