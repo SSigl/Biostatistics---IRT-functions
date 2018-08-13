@@ -195,14 +195,17 @@ dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
     options(warn=1) 
   }else{
     result_LRT = data.frame("LRT"=c(0),"df"=c(0),"pvalue"=c(0))
+    result_parameters = as.array(paste("result_parameters",items,sep="_"))
     options(warn=-1) 
     for(i in 1:len){
       result_dif = tryCatch(dif_poly_int(data,item=items[i],itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=FALSE),error=function(e) NA)   
       if(is.na(result_dif)==FALSE){
         result_LRT[i,] = result_dif[["LRT"]]
-        result_parameters = result_dif[["parameters"]]
+        assign(result_parameters[i],result_dif[["parameters"]])
       }
     }
+    result_parameters = apply(result_parameters,1,FUN=get)
+    names(result_parameters) <- items
     options(warn=-1) 
     rownames(result_LRT)=items
     result = list("LRT"=result_LRT,"parameters"=result_parameters)
