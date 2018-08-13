@@ -88,10 +88,15 @@ This "differenciate" function is an "intermediary function" : we use it in sever
 
 Now, we wish to test DIF on the items of a order polytomous items database, according to a covariate. For this, we use the "dif_poly_int" function, which takes in argument : 
 > "data", the studied dataframe ;
+
 > "item", the item whom we wish to test DIF according to the covariable ; "item" must be a character string ;
+
 > "itemlist", the list of items on which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
+
 > "diffvar", the covariate from which we differenciate the item "item" ; "diffvar" must be a character string ;
+
 > "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+
 > "toPlot", optional, default value set to "FALSE" : we may precise "toPlot = TRUE" to have in addition the plot of the expected values of the differenciated items.
 
 We now describe the running of the function :
@@ -117,12 +122,27 @@ This "dif_poly" function may be used for only one item in the "items" argument, 
 When we apply a gpcm model on a polytomous dataframe, we wish to perform simulations in order to check the model's adequation to the data. For this, we wrote several functions. First, the most basic ones we use are "simulation_1_int" and "simulation_1". The idea is the following : for an item in a subscale, we plot the success rate of this items in function of the real total score obtained by the test-takers ; we apply the gpcm-model and we extract the persons parameters and the parameters of the studied item ; we then sample the persons locations (bootstrap) and from the model parameters, we simulate a polytomous responses dataset ; we may then calculate the simulated score and plot it in the same graph as the first plot. We repeat the sampling several times to see, for the studied item, how similar the simulated success rates are from the real sucess rate. 
 
 The intermediary function "simulation_1_int" takes in argument :
+
 > the studied dataframe "data" ;
+
 > "item", the item whom we shall trace the success rate according to the total score ; let's take an example : we wish to know the sucess rate of item n°3 depending on the total score of the test-takers, which is between 0 and 10 ; then, for each possible value of the score (0, 1, 2, etc), we calculate the mean of the item n°3 on all persons who obtained this possible value of the score ; so, we first restrain the database to the persons who had a total score of 0 and we calculate the mean of the item n°3, then we do the same with the persons who had a total score of 1, etc ; we then obtain for each possible value of the score the corresponding mean of the item, which we call "sucess rate" (the idea is pretty much the same), and we may plot this item sucess rate in function of the score ; "item" must be a character string ;
+
 > "itemlist", the list of items on which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
+
 > "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+
 > "B" for "bootstrap", which is the number of simulations we wish to lead ;
-> "sc_gp" for "score group" :
+
+> "sc_gp" for "score group" : this is an optional parameter, by default set to 1 ; "sc_gp" indicates in how many levels we need to recode the total score, to improve the plot's readibility ; indeed, for example if we study a subscale of 6 items between 1 and 5, the score might goes from 0 (because of missing values) to 30 ; then, we might want to recode this score variable so it has only 3, 4 or 5 levels for instance. 
+
+We now describe the running of the functions :
+
+- "initialiazing -- creation of score -- re-level score" :
+first, we restrain the dataset on the subscale defined by "itemlist" and we calculate the corresponding score by summing the result for each item by row ; when "sc_gp" is higher than 1 (which is the by default value), we calculate the quantiles of the score distribution so to split this distribution in a number of "sc_gp" equal parts, and we may then recode the score variable on this cut ; we then have the levels of the score variable ;
+
+- "calculate real sucess rate" ; 
+for each level of the score variable, we restrain the dataset to keep only the rows which got the studied value of the score and we calculate the mean of the item we are intereted in.
+
 
 
 
