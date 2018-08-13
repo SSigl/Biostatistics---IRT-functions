@@ -94,16 +94,13 @@ regather = function(data,item,diffvar){
     list_levels =append(list_levels,list(levels(as.factor(data[which(data[,diffvar]==level[i]),][,item]))))
   }
   same_level = c()
-  for(i in 1:(n-1)){ 
-    l1 = list_levels[[i]]
-    l2 = list_levels[[i+1]]
-    l = intersect(l1,l2)
-    same_level = c(same_level,c(length(setdiff(l1,l)) > 0 | length(setdiff(l2,l) >0)))
+  # levels met for each level of the covariate
+  common = as.numeric(Reduce(intersect,list_levels))
+  stopifnot(is.null(common)==FALSE)
+  for(i in 1:n){ 
+    same_level = c(same_level,c(length(setdiff(list_levels[[i]],common))>0))
   }
   if(TRUE %in% same_level){
-    # levels met for each level of the covariate
-    common = as.numeric(Reduce(intersect,list_levels))
-    stopifnot(is.null(common)==FALSE)
     p = length(common)
     data$var <- data[,item] # recoded variable
     data$var[data$var <= common[1]] <- common[1] # recoding
