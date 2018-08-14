@@ -277,6 +277,7 @@ There is no option to lead "simulation_2" because "simulation_3" provides more i
 
 # To globally test an item's dif over several datasets : "test_item_int" (intermediary function) and "test_item"
 
+The "dif_poly" function allows us to check DIF for several items and one covariate in one database. Now, suppose we have several databases with the same variables (i.e. items) and for each database several covariate. For one item, we wish to have a global overview of whether DIF is observed in each database and for each covariate.
 
 
 
