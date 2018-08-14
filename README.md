@@ -91,7 +91,7 @@ Now, we wish to test DIF on the items of a order polytomous items database, acco
 
 > "item", the item whom we wish to test DIF according to the covariable ; "item" must be a character string ;
 
-> "itemlist", the list of items on which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
+> "itemlist", the list of items to which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
 
 > "diffvar", the covariate from which we differenciate the item "item" ; "diffvar" must be a character string ;
 
@@ -151,7 +151,7 @@ we then plot the mean of the item we previously calculated depending on the scor
 
 - "model" :
 
-we apply the model on the dataset restrained to the list of items "itemlist" (we must not include the score column in the model) ; we save the items' parameters in "coef" and the persons' parameters in "persons" ; there is a subtility here : the persons' parameters is a dataframe which includes all possible rows of answers originally in the dataset, and for each row, the corresponding person location and the number of time this row is observed in the dataset ; for example, if we consider the subscale item1, item2, item3, we suppose that 3 people have answered (1,2,1) and 2 people have answered (3,3,4) : then, in the persons' parameters, those anwers will appear only one time, and the "Obs" column precises that the first answer appeared 3 times and that the second answer appeared 2 times ; we later wish to sample the persons' parameters and so, we need to take the number of observations into account ; for this, we calculate for every row its frequency of occurrence (in other words, we weight each row) ;
+we apply the model on the dataset restrained to the list of items "itemlist" (we must not include the score column in the model) ; we save the items' parameters in "coef" and the persons' parameters in "persons" ; there is a subtlety here : the persons' parameters is a dataframe which includes all possible rows of answers originally in the dataset, and for each row, the corresponding person location and the number of time this row is observed in the dataset ; for example, if we consider the subscale item1, item2, item3, we suppose that 3 people have answered (1,2,1) and 2 people have answered (3,3,4) : then, in the persons' parameters, those anwers will appear only one time, and the "Obs" column precises that the first answer appeared 3 times and that the second answer appeared 2 times ; we later wish to sample the persons' parameters and so, we need to take the number of observations into account ; for this, we calculate for every row its frequency of occurrence (in other words, we weight each row) ;
 
 - "Bootstrap" : now, we may do the simulations strictly speaking ; we repeat the following description a number "B" of times :
 
@@ -172,7 +172,64 @@ This "simulation_1" function may be used for only one item in the "items" argume
 
 # To lead a simulation with differenciate variables : "simulation_2_int" (intermediary function) and "simulation_2"
 
-Now, we might wish to lead the simulation we previously described not on the original dataset but on the dataset with differenciated items. For this, we use two functions : "simulation_2" and "simulation_2_int". The "simulation_2_int" function is only an intermediary function.
+Now, we might wish to lead the simulation we previously described not on the original dataset but on the dataset with differenciated items. For this, we use two functions : "simulation_2" and "simulation_2_int". The "simulation_2_int" function is only an intermediary function. 
+
+The "simulation_2" function takes the following arguments : 
+
+> "data", the regarded dataset ; "data" must be a data.frame ;
+
+> "item", the item we wish to differenciate ; "item" must be a character string ; 
+
+> "itemlist", the list of items to which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
+
+> "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+
+> "B" for "bootstrap", which is the number of simulations we wish to lead ;
+
+> "sc_gp" for "score group" : this is an optional parameter, by default set to 1 ; "sc_gp" indicates in how many levels we need to recode the total score, to improve the plot's readibility ; indeed, for example if we study a subscale of 6 items between 1 and 5, the score might goes from 0 (because of missing values) to 30 ; then, we might want to recode this score variable so it has only 3, 4 or 5 levels for instance ;
+
+> "diffvar", the covariate according which we wish to differenciate the item "item" in the dataset "data" ; "diffvar" must be a character string ;
+
+> "unq" for "unique" : this is an optional parameter, by default set to "TRUE" ; "unq" indicates whether the "simulation_2" function is applied only once or in a more general function ; this parameter is useful to select the appropriate par for the plot's display ;
+
+The "simulation_2" function's running is the following : 
+
+- first, we differenciate the regarded item using the "differenciate" function ; we obtain a new dataset with the differenciated items and also the names of the newly-differenciated items, that we save in "diff_names" ; 
+
+- then, we apply the "simulation_1" function to the dataset restrained to the itemlist and regarding the item "item" (we do not need the differenciated items there) ; 
+
+- after this, we apply a second function, "simulation_2_int", to the dataset with the differenciated items for the items in "diff_names", i.e. the differenciated items ;
+
+
+We now present this second function, "simulation_2_int" ; this function has the following arguments : 
+
+> "data", the regarded dataset, which contains the differenciated items we previously created using the "differenciate" function ;
+
+> "item", the item for which we wish to plot the real and simulated success rates ; this item must be a differenciated item (this is why the "simulation_2_int" function is in "simulation_2" function successively applied to the variables in "diff_names") ; 
+
+> "itemlist", the list of items which are not differenciated and that we need to take in account to apply the rasch model ; in relation to the "itemlist" parameter of the "simulation_2" function, the itemlist we consider here is the previous itemlist to which we substract the initial item "item" (since we only wish to keep the differenciated items, and not the original one) ; we take an example to make things clearer : assume we wish to differenciate "item1" according to a two-levels covariate and we consider the itemlist ("item1, item2, item3") ; the differenciated items are "item1_1" and "item1_2" ; we then naturally want to apply the rasch model on ("item1_1, item1_2, item_2, item_3") and not ("item1, item1_1, item1_2, item_2, item_3") ; this is why we do not consider the same itemlist in the two functions ; 
+
+> "diff_names", the names of the differenciated variables, that we need to apply the rasch model ;
+
+> "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+
+> "B" for "bootstrap", which is the number of simulations we wish to lead ;
+
+> "sc_gp" for "score group" : this is an optional parameter, by default set to 1 ; "sc_gp" indicates in how many levels we need to recode the total score, to improve the plot's readibility ; indeed, for example if we study a subscale of 6 items between 1 and 5, the score might goes from 0 (because of missing values) to 30 ; then, we might want to recode this score variable so it has only 3, 4 or 5 levels for instance. 
+
+Concerning the running of the function, it basically follows the same steps as in the "simulation_1_int" function but there are a few subtleties we will now precise : 
+
+- there are no changes in the calculation of the score, except that we have to be carefull to the objects we manipulate ("tot_list" and not "itemlist" for example) ;
+
+- for the simulation strictly speaking, there is one major difference : concerning the sampling, we have to sample a dataset for each level of the differentiating variable ; initially, we successively have to restrain the persons parameters' dataset for each level of the differenciating variable and sample this dataset (bootstrap) ; then, we apply the same steps as in the "simulation_1_int" function for each level of the differenciating variable ; finally, we may merge all the simulated dataset we obtain to have only one simulated dataset and then plot the simulated success rate of the regarded differenciated items.
+
+
+The "simulation_2_int" function displays the plot of the real and simulated success rates for one differenciated item ; it is an intermediary function. The "simulation_2" function displays the plot of the real and simulated success rates for one item and the differenciated items obtained from this original item ; all the plots are displayed side by side so that these might be compared. 
+
+If we wish to apply the whole operation to several items, we might use the "simulation_2_tot" function, which will simply successively apply the "simulation_2" function to a vector of items, "items". 
+
+
+
 
 
 
