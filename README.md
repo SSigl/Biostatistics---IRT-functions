@@ -275,6 +275,8 @@ Now, we precise which arguments we need to provide for which type of simulation 
 There is no option to lead "simulation_2" because "simulation_3" provides more information. 
 
 
+# To globally test an item's dif over several datasets : "test_item_int" (intermediary function) and "test_item"
+
 
 
 
