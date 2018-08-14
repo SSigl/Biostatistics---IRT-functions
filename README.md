@@ -114,7 +114,7 @@ Now, we generally wish to test DIF not on a single item on a list of items. For 
 
 The reader should note that it might happen that the dif_poly_int function returns an error because of convergence's problems of the model. This is a problem if we wish to apply the "dif_poly" function on a list of several items because it might interrupt the process : to avoid this, we use "tryCatch" on "dif_poly_int" so that if the "dif_poly_int" returns no result, the loop does pass to the next item in the "items" list. 
 
-This "dif_poly" function may be used for only one item in the "items" argument, so we will not use the "dif_poly_int" function, which is only an intermediary function useful in the "dif_poly" function.
+This "dif_poly" function may be used for only one item in the "items" argument, so we will not use the "dif_poly_int" function, which is only an intermediary function useful in the "dif_poly" function, and we will only use "dif_poly".
 
 
 # To check whether the model is well-adjusted to our data : "simulation_1_int" (intermediary function) and "simulation_1"
@@ -138,10 +138,42 @@ The intermediary function "simulation_1_int" takes in argument :
 We now describe the running of the functions :
 
 - "initialiazing -- creation of score -- re-level score" :
+
 first, we restrain the dataset on the subscale defined by "itemlist" and we calculate the corresponding score by summing the result for each item by row ; when "sc_gp" is higher than 1 (which is the by default value), we calculate the quantiles of the score distribution so to split this distribution in a number of "sc_gp" equal parts, and we may then recode the score variable on this cut ; we then have the levels of the score variable ;
 
-- "calculate real sucess rate" ; 
-for each level of the score variable, we restrain the dataset to keep only the rows which got the studied value of the score and we calculate the mean of the item we are intereted in.
+- "calculate real sucess rate" : 
+
+for each level of the score variable, we restrain the dataset to the rows for which the score is equal to the regarded and for this selection, we calculate the mean of the item we are intereted in ;
+
+- "plot real sucess rate" :
+
+we then plot the mean of the item we previously calculated depending on the score ;
+
+- "model" :
+
+we apply the model on the dataset restrained to the list of items "itemlist" (we must not include the score column in the model) ; we save the items' parameters in "coef" and the persons' parameters in "persons" ; there is a subtility here : the persons' parameters is a dataframe which includes all possible rows of answers originally in the dataset, and for each row, the corresponding person location and the number of time this row is observed in the dataset ; for example, if we consider the subscale item1, item2, item3, we suppose that 3 people have answered (1,2,1) and 2 people have answered (3,3,4) : then, in the persons' parameters, those anwers will appear only one time, and the "Obs" column precises that the first answer appeared 3 times and that the second answer appeared 2 times ; we later wish to sample the persons' parameters and so, we need to take the number of observations into account ; for this, we calculate for every row its frequency of occurrence (in other words, we weight each row) ;
+
+- "Bootstrap" : now, we may do the simulations strictly speaking ; we repeat the following description a number "B" of times :
+
+> first, we sample the persons' parameters and we only save the persons' location
+
+> "calculate for each person location the probability P(Xiv=x|theta) for x every possible levels of each item" : for each persons' location we previsouly sampled, we calculate, for each level of each item of the subscale, the probability that this item is equal to this level conditionnaly to this persons location ; we apply the link-function of the rasch model ;
+
+> "simulated dataset" : now that we have all the probabilities for each value of all items and for each persons' location, we may simulate a polytomous dataset using a multinomial law ; this way, by using a rasch model, we obtain a simulated dataset which is the same size of the original dataset ;
+
+> "simulated score" : we may now calculate the score of the simulated dataset and, as before, recode this score in "sc_gp" levels, using the same cuts as the ones used for recoding the real score ; then, we do as before and we calculate the mean of the items for each level of the score ; finally, we might plot this simulated success rate in the same graph as the original plot.
+
+
+The "simulation_1_int" function displays the plot of the real and simulated success rates for only one item ; it is an intermediary function. To display the results of this "simulation_1_int" function for several items, we use the "simulation_1" function. 
+
+The "simulation_1" function has the same arguments as the "simulation_1_int" function, except for "item" which is replaced by "items" and must be a vector of the items for which we wish to lead the simulation ; "items" must be a vector of string characters ; note that all items in "items" must also be in "itemlist". The "simulation_1" function successively applys the "simulation_1_int" function for all items in "items". 
+
+This "simulation_1" function may be used for only one item in the "items" argument, so we will not use the "simulation_1_int" function, which is only an intermediary function useful in the "simulation_1" function, and we will only use "simulation_1". 
+
+# To lead a simulation with differenciate variables : "simulation_2_int" (intermediary function) and "simulation_2"
+
+Now, we might wish to lead the simulation we previously described not on the original dataset but on the dataset with differenciated items. For this, we use two functions : "simulation_2" and "simulation_2_int". The "simulation_2_int" function is only an intermediary function.
+
 
 
 
