@@ -243,6 +243,13 @@ If we wish to repeat "simulation_4_int" function on several items instead of onl
 
 # A global function : "simulation"
 
+To ease the manipulation of those functions, we wrote a global "simulation" function : depending on the arguments you provide, you will obtain a different result.
+
+This "simulation" function may take several arguments : 
+
+> "data", the studied dataset ; "data" must be a dataframe ;
+
+> "item", the item for which we wish to plot the success rate and lead the simulation ; "item" must be a character string ;
 
 
 
