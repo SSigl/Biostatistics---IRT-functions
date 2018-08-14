@@ -251,6 +251,29 @@ This "simulation" function may take several arguments :
 
 > "item", the item for which we wish to plot the success rate and lead the simulation ; "item" must be a character string ;
 
+> "itemlist", the list of items on which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
+
+> "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+
+> "B" for "bootstrap", which is the number of simulations we wish to lead ;
+
+> "sc_gp" for "score group" : this is an optional parameter, by default set to 1 ; "sc_gp" indicates in how many levels we need to recode the total score, to improve the plot's readibility ; indeed, for example if we study a subscale of 6 items between 1 and 5, the score might goes from 0 (because of missing values) to 30 ; then, we might want to recode this score variable so it has only 3, 4 or 5 levels for instance ;
+
+> "diffvar" is an optional parameter ; it precise the covariate according which we wish to differenciate the item "item" in the dataset "data" ; "diffvar" must be a character string ;
+
+> "samePlot" is an optional parameter ; it is a boolean, by default set to "FALSE".
+
+Now, we precise which arguments we need to provide for which type of simulation :
+
+- if we want to lead the "classic" simulation, which means apply the "simulation_1" function, we do not need to fill out "diffvar" nor "samePlot" ;
+
+- if we want to differenciate the regarded item, we need to provide "diffvar" ; then, there are two options :
+
+> we might want to lead the simulation for every item in itemlist and for the differenciated items ; then, we do not need to provide any additionnal parameter ; the carried out simulation will then be "simulation_3" ;
+> or, we might want to plot in the same graph the real success rate of an original item, the simulated success rate of this original item, and the real success rates of differenciated items created from the original item and a differentiating variable ; then, we must provide "samePlot = TRUE" ; the carried out simulation will then be "simulation_4" ;
+
+There is no option to lead "simulation_2" because "simulation_3" provides more information. 
+
 
 
 
