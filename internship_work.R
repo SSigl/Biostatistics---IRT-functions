@@ -619,6 +619,159 @@ simulation_4 = function(data,items,itemlist,constraint,B,sc_gp,diffvar){
   }
 }
 #===================================================================================#
+                            
+
+                            
+#===================================================================================#
+simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constraint,B,sc_gp){
+  # initializing - creation of score
+  tot_list <- c(itemlist,dif_list,to_dif_list)  
+  data = subset(data,select=c(tot_list))
+  data$score <- apply(data,1,sum,na.rm = TRUE)
+  if(sc_gp >1){
+    quantiles = as.numeric(quantile(data$score,probs=0:sc_gp/sc_gp))
+    data$score <- quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp)
+  }
+  R = as.integer(levels(factor(data$score)))
+  tab = data.frame(level_R=R,S = rep(0,length(R)))
+  # calculate real sucess rate
+  for(i in 1:length(R)){
+    data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
+    tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
+  }
+  # plot real sucess rate
+  y_inf = min(data[,tot_list],na.rm=TRUE)
+  y_sup = max(data[, tot_list],na.rm=TRUE)
+  if(sc_gp>1){x_lab="regathered score"}else{x_lab = "score"}
+  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Sucess rate for item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
+  # model
+  fit = gpcm(data[,c(tot_list)],constraint=constraint)
+  coef = coef(fit)
+  persons = data.frame(factor.scores(fit)$score.dat)
+  n_item = length(itemlist) + 2
+  n_dif = length(to_dif_list)
+  
+  # Bootstrap
+  for(b in 1:B){
+    data_names = paste("data_B",level,sep="_") # sampled databases
+    simul_names = paste("simul",level,sep="_") # simulated databases    
+    for(i in 1:n_dif){
+      data_B = subset(persons,is.na(persons[,dif_list[i]])==FALSE)
+      n_pers = sum(data_B[,"Obs"])
+      data_B[,"Obs"] <- data_B[,"Obs"]/n_pers
+      data_B = data_B[sample(nrow(data_B),size=n_pers,replace=TRUE,prob=data_B[,"Obs"]),]
+      data_B = subset(data_B,select=c("z1"))
+      rownames(data_B) <- NULL	
+      assign(data_names[i], data_B) 
+    }
+    # calculate for each person location the probability P(Xiv=x|theta) for x every possible levels of each item
+    for(l in 1:n_dif){
+      for(k in 1:n_item){
+        tot_list <- c(itemlist,dif_list[l],to_dif_list[l])
+        item_B = tot_list[k]
+        values = as.integer(levels(factor(data[,item_B])))
+        n_values = length(values)
+        # extract and calculate useful entities : discrimination, eta, beta, quotient
+        parameters = as.data.frame(coef[item_B,])
+        parameters["Catgr.0",] <-0
+        parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
+        colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
+        alpha = parameters["Dscrmn",]
+        eta = c=("eta"=c(0))
+        for(j in 1:(n_values-1)){
+          beta_j = parameters[paste("Catgr",j,sep="."),]
+          eta=c(eta,eta[j]-beta_j)
+        }
+        quotient = 0
+        for(j in 1:n_values){
+          quotient = quotient + exp(alpha*(values[j]*get(data_names[l])[,"z1"]+eta[j]))
+        }
+        quotient <- 1/quotient
+        var_names = paste("proba",item_B,values,sep="_")
+        data_B = get(data_names[l]) # "transition" database
+        for(j in 1:n_values){
+          data_B$var <- exp(alpha*(values[j]*data_B$z1+eta[j]))*quotient
+          colnames(data_B)[colnames(data_B)=="var"] <- var_names[j]
+        }
+        assign(data_names[l],data_B)
+      }
+    }
+    
+    # simulated datasets
+    for(l in 1:n_dif){
+      tot_list <- c(itemlist,dif_list[l],to_dif_list[l])
+      data_B = get(data_names[l])
+      simul_data = data[1,tot_list]
+      n_pers= dim(data_B)[1]
+      for(i in 1:n_pers){
+        for(k in 1:n_item){
+          item_B = tot_list[k]
+          values = as.integer(levels(factor(data[,item_B])))
+          var_names = paste("proba",item_B,values,sep="_")
+          simul_data[i,k] <- values[which(as.data.frame(rmultinom(n=1,size=1,data_B[i,var_names]))==1)]
+        }
+      } 
+      for(m in 1:n_dif){
+        if(m !=l){
+          simul_data$var <- NA
+          colnames(simul_data)[colnames(simul_data)=="var"] <- to_dif_list[m]
+          simul_data$var <- NA
+          colnames(simul_data)[colnames(simul_data)=="var"] <- dif_list[m]
+          assign(simul_names[l],simul_data)
+        }
+      }
+    }
+    
+    # final simulated dataset
+    simul_data = get(simul_names[1])
+    for(l in 2:n_dif){
+      simul_data <- rbind(simul_data,get(simul_names[l]))
+    }
+    simul_data$score <- apply(simul_data,1,sum,na.rm=TRUE)
+    if(sc_gp >1){
+      simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)
+    }
+    R = as.integer(levels(factor(simul_data$score)))
+    tab_b = data.frame(level_R=R,S = rep(0,length(R)))
+    for(i in 1:length(R)){
+      data_r = subset(simul_data,simul_data$score == as.numeric(R[i]) & is.na(simul_data[,item])==FALSE,select=item)
+      tab_b[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
+    }
+    lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
+  }  
+  lines(tab$level_R,tab$S,col="blue",lwd=2)
+  legend("bottomright",legend=c("real success rate","sim success rate"),col=c("blue","red"),lty=c(1,3),cex=0.6)
+}
+
+simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE){
+  # first differenciation
+  result = differenciate(data,item_dif,diffvar)
+  data = result$data
+  dif_list=  result$diff_names
+  itemlist = c(itemlist[-which(itemlist==item_dif)])
+  
+  # second differenciation
+  result = differenciate(data,item,diffvar)
+  data=result$data
+  to_dif_list = result$diff_names
+  len = length(to_dif_list)
+  
+  # levels of the covariate
+  level = levels(as.factor(data[,diffvar]))
+  
+  if(unq){
+    par(mfrow=select_par(len+1))}
+  # simulation for the original item
+  simulation_2_int(data=data,item=item,itemlist=itemlist,diff_names=dif_list,constraint=constraint, B=B,sc_gp=sc_gp)
+  # simulation for the differenciated items
+  itemlist = itemlist[-which(itemlist == item)]
+  for(i in 1:len){
+    simulation_5_int(data=data,item=to_dif_list[i],itemlist=itemlist,dif_list=dif_list,to_dif_list=to_dif_list,level=level,constraint=constraint,B=B,sc_gp=sc_gp)
+  }
+}
+#===================================================================================#
+                            
+                            
 
 #===================================================================================#
 simulation = function(data,items,itemlist,constraint,B,sc_gp,diffvar=NULL,samePlot=FALSE){
