@@ -198,7 +198,7 @@ The "simulation_2" function's running is the following :
 
 - then, we apply the "simulation_1" function to the dataset restrained to the itemlist and regarding the item "item" (we do not need the differenciated items there) ; 
 
-- after this, we apply a second function, "simulation_2_int", to the dataset with the differenciated items for the items in "diff_names", i.e. the differenciated items ;
+- after this, we apply a second function, "simulation_2_int", to the dataset with the differenciated items for the items in "diff_names", i.e. the differenciated items.
 
 
 We now present this second function, "simulation_2_int" ; this function has the following arguments : 
@@ -241,6 +241,68 @@ The "simulation_4_int" function has the same arguments as the "simulation_2" fun
 
 If we wish to repeat "simulation_4_int" function on several items instead of only one, we use the "simulation_4" function which calls the "simulation_4_int" function for each item in "items", which is a vector of character strings. 
 
+# To apply a simulation to a database with one differenciated item : "simulation_5_int" (intermediary function) and "simulation_5"
+
+Assume you face the following case : you lead simulations to visually identify DIF and you observe that two items of the same subscale seem suspect. You may wish to re-apply the simulation on one of the suspected item by differenciating the other suspected item and applying the model to the subscale with these differenciated items. To lead that kind of simulations, we needed to write two new functions : "simulation_5_int", which is an intermediary function, and "simulation_5".
+
+The "simulation_5" function takes the following arguments :
+
+> "data", the regarded dataset ; "data" must be a data.frame ;
+
+> "item", the item we wish to differenciate and whom we wish to plot the success rate for the differenciated items ; "item" must be a character string ; 
+
+> "item_dif", the second item we wish to differenciate but whom we do not wish to plot the success rate ;
+
+> "itemlist", the list of items to which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" and "item_dif" belong to "itemlist" ;
+
+> "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+
+> "B" for "bootstrap", which is the number of simulations we wish to lead ;
+
+> "sc_gp" for "score group" : this is an optional parameter, by default set to 1 ; "sc_gp" indicates in how many levels we need to recode the total score, to improve the plot's readibility ; indeed, for example if we study a subscale of 6 items between 1 and 5, the score might goes from 0 (because of missing values) to 30 ; then, we might want to recode this score variable so it has only 3, 4 or 5 levels for instance ;
+
+> "diffvar", the covariate according which we wish to differenciate the item "item" and the item "item_dif" in the dataset "data" ; "diffvar" must be a character string ;
+
+> "unq" for "unique" : this is an optional parameter, by default set to "TRUE" ; "unq" indicates whether the "simulation_2" function is applied only once or in a more general function ; this parameter is useful to select the appropriate par for the plot's display.
+
+The "simulation_5" function's running is the following : 
+
+- first, we differenciate the regarded items "item_dif" and "item" using the "differenciate" function ; we obtain a new dataset with the differenciated items and also the names of the newly-differenciated items, that we respectively save in "dif_list" and "to_dif_list" ; we also save the levels of the covariate "diff_var" in "level" ;
+
+- then, we apply the "simulation_2_int" function to the dataset restrained to the items itemlist which are not differenciated, the item "item" and the differenciated items of "dif_list", regarding the item "item" ; in other words, we do the simulation for the original item "item", but we have to apply the "simulation_2_int" function because of the other items from "dif_list" which are differenciated ; indeed, simulating a dataset with differenciated items requires additive steps compared to a dataset with only non-differenciated items ;
+
+- after this, we apply a second function, "simulation_5_int", to the dataset with the differenciated items for the items in "dif_list", i.e. the differenciated items of the item we do not wish to lead the simulation for, and the differenciated items for the items in "to_dif_list", i.e. the differenciated items of the item we do wish the lead the simulation for.
+
+We now present this second function, "simulation_5_int" ; this function has the following arguments : 
+
+> "data", the regarded dataset, which contains the differenciated items we previously created using the "differenciate" function from dif_list and from to_dif_list (which means, the differenciated items for the two items we are initially interested in);
+
+> "item", the item for which we wish to plot the real and simulated success rates ; this item must be one of the differenciated item from "to_dif_list" (this is why the "simulation_5_int" function is in "simulation_5" function successively applied to the variables in "to_dif_list") ; 
+
+> "itemlist", the list of items which are not differenciated and that we need to take in account to apply the rasch model ; in relation to the "itemlist" parameter of the "simulation_5" function, the itemlist we consider here is the previous itemlist to which we substract the initial items "item" and "item_dif" (since in the rasch model, we only wish to keep the differenciated items, and not the original one) ; we take an example to make things clearer : assume we have to differenciate "item1" and "item2" according to a two-levels covariate and we consider the itemlist ("item1, item2, item3") ; the differenciated items are ("item1_1, item1_2") and ("item2_1, item2_2") : we wish to lead the simulation for the differenciated items from "item2", including differenciated items from "item1" ; we then naturally want to apply the rasch model on ("item1_1, item1_2, item2_1, item2_2, item3") and not ("item1, item1_1, item1_2, item2, item2_1, item2_2, item3") ; this is why we do not consider the same itemlist in the two functions ; 
+
+> "dif_list", the names of the differenciated variables for "item_dif", that we need to apply the rasch model, and for which we do not wish to lead the simulations for ;
+
+> "to_dif_list", the names of the differenciated variables for "item", that we need to apply the rasch model, and for which we do wish to lead the simulation for ; 
+
+> "level", the levels of the covariate "diffvar" which was initially used to differenciate the database ; 
+
+> "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+
+> "B" for "bootstrap", which is the number of simulations we wish to lead ;
+
+> "sc_gp" for "score group" : this is an optional parameter, by default set to 1 ; "sc_gp" indicates in how many levels we need to recode the total score, to improve the plot's readibility ; indeed, for example if we study a subscale of 6 items between 1 and 5, the score might goes from 0 (because of missing values) to 30 ; then, we might want to recode this score variable so it has only 3, 4 or 5 levels for instance. 
+
+Concerning the running of the function, it basically follows the same steps as in the "simulation_1_int" function but there are a few subtleties we will now precise : 
+
+- there are no changes in the calculation of the score, except that we have to be carefull to the objects we manipulate ("tot_list" and not "itemlist" for example) ;
+
+- for the simulation strictly speaking, there is one major difference : concerning the sampling, we have to sample a dataset for each level of the differentiating variable ; initially, we successively have to restrain the persons parameters' dataset for each level of the differenciating variable and sample this dataset (bootstrap) ; then, we apply the same steps as in the "simulation_1_int" function for each level of the differenciating variable ; finally, we may merge all the simulated dataset we obtain to have only one simulated dataset and then plot the simulated success rate of the regarded differenciated items ; we may note that the fact that there is now two differenciated items instead of one does not introduce major changes compared to the "simulation_2_int" function.
+
+
+The "simulation_5_int" function displays the plot of the real and simulated success rates for one differenciated item from "to_dif_list" ; the model applied and used for the simulation is the model with all differenciated items (from dif_list and to_dif_list) ; "simulation_5_int" is an intermediary function. The "simulation_5" function displays the plot of the real and simulated success rates for one item and the differenciated items obtained from this original item, all this taking in account the other differenciated variables ; all the plots are displayed side by side so that these might be compared. 
+
+
 # A global function : "simulation"
 
 To ease the manipulation of those functions, we wrote a global "simulation" function : depending on the arguments you provide, you will obtain a different result.
@@ -259,7 +321,9 @@ This "simulation" function may take several arguments :
 
 > "sc_gp" for "score group" : this is an optional parameter, by default set to 1 ; "sc_gp" indicates in how many levels we need to recode the total score, to improve the plot's readibility ; indeed, for example if we study a subscale of 6 items between 1 and 5, the score might goes from 0 (because of missing values) to 30 ; then, we might want to recode this score variable so it has only 3, 4 or 5 levels for instance ;
 
-> "diffvar" is an optional parameter ; it precise the covariate according which we wish to differenciate the item "item" in the dataset "data" ; "diffvar" must be a character string ;
+> "diffvar" is an optional parameter ; it precises the covariate according which we wish to differenciate the item "item" in the dataset "data" ; "diffvar" must be a character string ;
+
+> "item_dif" is an optional parameter ; it precises that we wish to differenciate two items and apply a simulation to the differenciated item "item" by taking in account another differenciated item "item_dif" in the model ; note that if you wish to apply that kind of simulation, "diffvar" must necessarily be provided (or if it is not, the function will simply lead a classic simulation without taking the "item_dif" in account) ;
 
 > "samePlot" is an optional parameter ; it is a boolean, by default set to "FALSE".
 
@@ -267,9 +331,12 @@ Now, we precise which arguments we need to provide for which type of simulation 
 
 - if we want to lead the "classic" simulation, which means apply the "simulation_1" function, we do not need to fill out "diffvar" nor "samePlot" ;
 
-- if we want to differenciate the regarded item, we need to provide "diffvar" ; then, there are two options :
+- if we want to differenciate the regarded item, we need to provide "diffvar" ; then, there are three options :
+
+> if "dif_list" is also provided, the simulation lead is applied to the differenciated items from "item" once you already differenciated the item "item_dif" ; the regarded model is applied to the differenciated items obtained from "item" and "item_dif" ; the carried out simulation will then be "simulation_5" ;
 
 > we might want to lead the simulation for every item in itemlist and for the differenciated items ; then, we do not need to provide any additionnal parameter ; the carried out simulation will then be "simulation_3" ;
+
 > or, we might want to plot in the same graph the real success rate of an original item, the simulated success rate of this original item, and the real success rates of differenciated items created from the original item and a differentiating variable ; then, we must provide "samePlot = TRUE" ; the carried out simulation will then be "simulation_4" ;
 
 There is no option to lead "simulation_2" because "simulation_3" provides more information. 
