@@ -46,13 +46,15 @@ LR_test = function(model0,model1,display){
   LRT = -2*(L0[1]-L1[1])
   pvalue = round(1 - pchisq(LRT,df),digits=3)
   LRT = round(LRT,digits=3)
-  result = data.frame("LRT" =c(LRT), "df"=c(df),"pvalue"=c(pvalue))
+  ChiSQ = round(pchisq(LRT,df),digits=3)
+  result = data.frame("LRT" =c(LRT), "df"=c(df), "chisq"=ChiSQ, "pvalue"=c(pvalue))
   if(display==TRUE){
     text0 = "LR test :"
     text1 = paste("Log-likelihood ratio test",LRT,sep=":")
     text2 = paste("Degrees of freedom",df,sep=":")
-    text3 = paste("p-value",pvalue,sep=":")
-    LRtext = paste(text0,text1,text2,text3,sep="\n")
+    text3 = paste("Chi square",ChiSQ,sep=":")
+    text4 = paste("p-value",pvalue,sep=":")
+    LRtext = paste(text0,text1,text2,text3,text4,sep="\n")
     cat("\n")
     cat(LRtext)
     cat("\n")}
@@ -113,7 +115,7 @@ regather = function(data,item,diffvar){
     }
     k = which(colnames(data)==item)
     data <- data[,-k]
-    colnames(data)[colnames(data)=="var"] <- item
+    colnames(data)[colnames(datpa)=="var"] <- item
   }
   return(data)
 }
@@ -195,7 +197,7 @@ dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
     }
     options(warn=1) 
   }else{
-    result_LRT = data.frame("LRT"=c(0),"df"=c(0),"pvalue"=c(0))
+    result_LRT = data.frame("LRT"=c(0),"df"=c(0),"chisq"=c(0),"pvalue"=c(0))
     result_parameters = list()
     options(warn=-1) 
     for(i in 1:len){
@@ -316,7 +318,7 @@ simulation_1 = function(data,items,itemlist,constraint,B,sc_gp=1){
 
 
 #===================================================================================#
-simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp){
+simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1){
   # initializing - creation of score
   tot_list <- c(itemlist,diff_names)  
   data = subset(data,select=c(tot_list))
@@ -434,7 +436,7 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp){
 }
 
 
-simulation_2 = function(data,item,itemlist,constraint,B,sc_gp,diffvar,unq = TRUE){
+simulation_2 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE){
   result = differenciate(data,item,diffvar)
   data = result$data
   diff_names = result$diff_names
@@ -442,7 +444,7 @@ simulation_2 = function(data,item,itemlist,constraint,B,sc_gp,diffvar,unq = TRUE
   if(unq){
   par(mfrow=select_par(len+1))}
   # simulation for the original item
-  simulation_1_int(data=data,item,itemlist=itemlist,constraint=constraint,B=B,sc_gp=sc_gp)
+  simulation_1(data=data,item,itemlist=itemlist,constraint=constraint,B=B,sc_gp=sc_gp)
   # simulation for the differenciated items
   k = which(itemlist == item)
   itemlist = itemlist[-k]
@@ -451,7 +453,7 @@ simulation_2 = function(data,item,itemlist,constraint,B,sc_gp,diffvar,unq = TRUE
   }
 }
 
-simulation_2_tot = function(data,items,itemlist,constraint,B,sc_gp,diffvar){
+simulation_2_tot = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar){
   len_1 = length(items)
   len_2 = length(levels(as.factor(data[,diffvar])))
   par(mfrow=select_par(len_2+1))
@@ -467,7 +469,7 @@ simulation_2_tot = function(data,items,itemlist,constraint,B,sc_gp,diffvar){
 
 
 #===================================================================================#
-simulation_3 = function(data,item,itemlist,constraint,B,sc_gp,diffvar){
+simulation_3 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
   n = length(itemlist)
   len = length(levels(as.factor(data[,diffvar]))) + n
   par(mfrow=select_par(len))
@@ -484,7 +486,7 @@ simulation_3 = function(data,item,itemlist,constraint,B,sc_gp,diffvar){
 
 
 #===================================================================================#
-simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp,diffvar){
+simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
   # initializing - creation of score
   result = differenciate(data,item,diffvar)
   data = result$data
@@ -609,7 +611,7 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp,diffvar){
   legend("bottomright",legend=legend,col=list_colors,lty=c(1,3,rep(1,len)),cex=0.5)
 }
 
-simulation_4 = function(data,items,itemlist,constraint,B,sc_gp,diffvar){
+simulation_4 = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar){
   len = length(items)
   par(mfrow=select_par(len))
   for(i in 1:len){
@@ -619,9 +621,10 @@ simulation_4 = function(data,items,itemlist,constraint,B,sc_gp,diffvar){
   }
 }
 #===================================================================================#
-                            
 
-                            
+
+
+
 #===================================================================================#
 simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constraint,B,sc_gp){
   # initializing - creation of score
@@ -769,17 +772,25 @@ simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar
     simulation_5_int(data=data,item=to_dif_list[i],itemlist=itemlist,dif_list=dif_list,to_dif_list=to_dif_list,level=level,constraint=constraint,B=B,sc_gp=sc_gp)
   }
 }
-#===================================================================================#
-                            
-                            
+
+
+
 
 #===================================================================================#
-simulation = function(data,items,itemlist,constraint,B,sc_gp,diffvar=NULL,samePlot=FALSE){
+
+
+
+
+#===================================================================================#
+simulation = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar=NULL,item_dif=NULL,samePlot=FALSE){
   if(is.null(diffvar)==FALSE){
+    if(is.null(item_dif)==FALSE){
+      simulation_5(data,item,item_dif,itemlist,constraint,B,sc_gp,diffvar)
+    }else{
     if(samePlot==TRUE){
       simulation_4(data,items,itemlist,constraint,B,sc_gp,diffvar)
     }else{
-      simulation_3(data,items,itemlist,constraint,B,sc_gp,diffvar)}
+      simulation_3(data,items,itemlist,constraint,B,sc_gp,diffvar)}}
   }else{
     simulation_1(data,items,itemlist,constraint,B,sc_gp)  
   }
@@ -788,12 +799,13 @@ simulation = function(data,items,itemlist,constraint,B,sc_gp,diffvar=NULL,samePl
 
 
 #===================================================================================#
+
 test_item_int = function(dataList,item,itemlist,covariates,constraint,eps){
   n = length(dataList)
   names = names(dataList)
   covar = as.character(covariates[,names[[1]]][1])
   study = names[[1]]
-  result_item = data.frame("covar"=c(covar),"study" = c(study),"pvalue"=c(0))
+  result_item = data.frame("covar"=c(covar),"study" = c(study),"LRT"=c(0),"chisq"=c(0),"pvalue"=c(0))
   for(i in 1:n){
     study = names[[i]]
     covar = levels(covariates[,study])
@@ -802,10 +814,10 @@ test_item_int = function(dataList,item,itemlist,covariates,constraint,eps){
       diffvar = covar[j]
       result = tryCatch(dif_poly(dataList[[study]],item=item,itemlist=itemlist,diffvar=diffvar,constraint=constraint,toPlot=FALSE),error=function(e) NA)
       if(is.na(result)){
-        data_int = data.frame("covar"=c(diffvar),"study"=c(study),"pvalue"="ERROR")    
+        data_int = data.frame("covar"=c(diffvar),"study"=c(study),"LRT"="ERROR","chisq"="ERROR","pvalue"="ERROR")    
       }else{
         result = result$LRT
-        data_int = data.frame("covar"=c(diffvar),"study"=c(study),"pvalue"=result[,"pvalue"])  
+        data_int = data.frame("covar"=c(diffvar),"study"=c(study),"LRT"=result[,"LRT"],"chisq"=result[,"chisq"],"pvalue"=result[,"pvalue"])  
       }
       result_item = rbind(result_item,data_int)
     }}
@@ -881,35 +893,35 @@ select_par = function(n){
 
 #===================================================================================#
 # importation of the dataset
-#setwd("your_path")
-#data <- read.csv("heiq.csv")
+setwd("/Users/SuzanneSigalla/Documents/ENSAE/2A/Stage/Travail stage/vraie base")
+data <- read.csv("heiq.csv")
 
 # creation and transformation of the databases
-#study_1 <- subset(data,data$study==1)
-#study_2 <- subset(data,data$study==2)
-#study_3 <- subset(data,data$study==3)
-#study_4 <- subset(data,data$study==4)
-#study_5 <- subset(data,data$study==5)
+study_1 <- subset(data,data$study==1)
+study_2 <- subset(data,data$study==2)
+study_3 <- subset(data,data$study==3)
+study_4 <- subset(data,data$study==4)
+study_5 <- subset(data,data$study==5)
 
 
-#study_1 = select_not_na(study_1)
-#study_2 = select_not_na(study_2)
-#study_3 = select_not_na(study_3)
-#study_4 = select_not_na(study_4)
-#study_5 = select_not_na(study_5)
+study_1 = select_not_na(study_1)
+study_2 = select_not_na(study_2)
+study_3 = select_not_na(study_3)
+study_4 = select_not_na(study_4)
+study_5 = select_not_na(study_5)
 
-#datalist = list("study_1" = study_1,"study_2" =study_2,"study_3" =study_3,"study_4" =study_4,"study_5" =study_5)
-#covariables = data.frame("study_1"=c("Sex","over64"),"study_2"=c("Sex","over48"),"study_3"=c("Sex","over72"),"study_4"=c("Sex","over76"),"study_5"=c("Sex","over51"))
+datalist = list("study_1" = study_1,"study_2" =study_2,"study_3" =study_3,"study_4" =study_4,"study_5" =study_5)
+covariables = data.frame("study_1"=c("Sex","over64"),"study_2"=c("Sex","over48"),"study_3"=c("Sex","over72"),"study_4"=c("Sex","over76"),"study_5"=c("Sex","over51"))
 
 # sub_scales
-#healthBehaviour =paste("Heiq",c(1,9,13,19),sep="")
-#engagementLife = paste("Heiq",c(2,5,8,10,15),sep="")
-#emotionWellbeing = paste("Heiq",c(4,7,12,14,18,21),sep="")
-#selfMonitoring = paste("Heiq",c(3,6,11,16,17,20),sep="")
-#beingConstructive = paste("Heiq",c(27,34,36,39,40),sep="")
-#skillAcquisition = paste("Heiq",c(23,25,26,30),sep="")
-#socialIntegration = paste("Heiq",c(22,28,31,35,37),sep="")
-#healthNavigation = paste("Heiq",c(24,29,32,33,38),sep="")
+healthBehaviour =paste("Heiq",c(1,9,13,19),sep="")
+engagementLife = paste("Heiq",c(2,5,8,10,15),sep="")
+emotionWellbeing = paste("Heiq",c(4,7,12,14,18,21),sep="")
+selfMonitoring = paste("Heiq",c(3,6,11,16,17,20),sep="")
+beingConstructive = paste("Heiq",c(27,34,36,39,40),sep="")
+skillAcquisition = paste("Heiq",c(23,25,26,30),sep="")
+socialIntegration = paste("Heiq",c(22,28,31,35,37),sep="")
+healthNavigation = paste("Heiq",c(24,29,32,33,38),sep="")
 
 
 
