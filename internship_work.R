@@ -11,7 +11,7 @@
 
 #%%%%%%%%%%%%%%
 #   packages
-rm(list = ls())
+#rm(list = ls())
 
 #install.packages("eRm",repos="http://cran.rstudio.com/")
 library(eRm)
