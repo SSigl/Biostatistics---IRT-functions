@@ -360,8 +360,36 @@ The "test_item_int" function takes the following arguments :
 
 > "eps" stands for "epsilon" ; it indicates the threshold for the log-likelihood ratio test we lead for each covariate in each database : if the p-value is smaller than this threshold then we consider that DIF is indeed observed.
 
+The "test_item_int" function simply applies the "dif_poly" function on the item, for each covariate of each dataset ; it returns for each case the result of the lig-likelihood ratio test.
+
+The "test_item_int" function is an intermediary function : in general, we wish to test dif not only on one item but on several items. For this, we use the "test_item" function : this function has the same arguments as the "test_item_int" function, except for "item", which is replaced by "items" : "items" must be a vector of items (a vector of character strings), all included in the vector "itemlist. We then apply the "test_item_int" function for each item of the "items" vector. Finally, "test_item" returns a list, as long as the number of items in "items" : for each item, the corresponding element of the list is a vector containing for each covariate and each database, the values of the log-likelihood ratio test, the chi-square, the p-value, and a "test" column whether the p-value is smaller than "eps", the provided threshold. Then, the result gives a global overview of the dif-character of the item in all the databases. 
+
+This "test_item" function may be used for only one item in the "items" argument, so we will not use the "test_item_int" function, which is only an intermediary function useful in the "test_item" function, and we will only use "test_item".
+
+# To sample a same number of rows in a dataset according to a variable's levels : "select_random"
+
+Assume the following situation : you have lead several studies on different groups of people and for each study, you have the same items but not the same number of surveyed people. You may work on the total dataset with all results combined but the differences in cross sections's sizes might have an influence on the results. Then, you may wish to sample, for each study, a same number of people, and then work on the total database with same-sized cross sections. 
+
+The "select_random" function takes the following arguments : 
+
+> "data", the regarded dataset ; "data" must be a dataframe ;
+
+> "refvar", the variable according which we will sample the database : for this, we will create one database for each level of "refvar" and sample the same number of rows in each newly-created database ; finally, we will merge all the sampled databases ;
+
+> "n", the number of lines we wish to sample in each database by level.
+
+The "select_random" function returns a dataframe which merges all sampled databases (one for each level of "refvar").
 
 
+
+# To select the right par to display several plots side by side : "select_par" (intermediary function)
+
+This function is used many times in the functions we previously described. It is useful when we have to display plots side by side and to still be able to see it all at the same time.
+The argument of "select_par" is "n", the number of displayed plots.
+
+# To remove the rows which only has NA answers : "select_not_na" (intermediary function)
+
+This function which takes a dataset "data" in argument removes in this dataset the lines with only "NA" answers.
 
 
 
