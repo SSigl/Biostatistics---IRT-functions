@@ -23,7 +23,7 @@ We take an example : suppose we suspect item1 to be a DIF for the covariate "Sex
 - then, we may apply a LR-test : if the p-value is under a specified thereshold, then we can reject the null hypothesis : "there is no DIF". 
 
 To this end, we wrote the "LR_test" function, which very basically apply a log-likelihood ratio test. This function takes in argument two models ("model0" and "model1"), which might be for example gpcm objects : the first model must be the one with the original item, and the second model the one with the items created from the covariate. This function has also a "display" argument : "display" must be a boolean, equal to "TRUE" if you wish to display the result in the R-Console. 
-The function returns a dataframe including the value of the LR-test, the degrees of freedom and the p-value. 
+The function returns a dataframe including the value of the LR-test, the degrees of freedom, the value of the chi-square and the p-value. 
 
 This function will be used in several other functions and generally won't be used "on its own", that's why we qualify it as an "intermediary function". 
 
@@ -344,7 +344,10 @@ There is no option to lead "simulation_2" because "simulation_3" provides more i
 
 # To globally test an item's dif over several datasets : "test_item_int" (intermediary function) and "test_item"
 
-The "dif_poly" function allows us to check DIF for several items and one covariate in one database. Now, suppose we have several databases with the same variables (i.e. items) and for each database several covariate. For one item, we wish to have a global overview of whether DIF is observed in each database and for each covariate.
+The "dif_poly" function allows us to check DIF for several items and one covariate in one database. Now, suppose we have several databases with the same variables (i.e. items) and for each database several covariate. For one item, we wish to have a global overview of whether DIF is observed in each database and for each covariate. The "test_item_int" and "test_item" functions provide this global overview.
+
+The "test_item_int" function takes in argument (...) 
+
 
 
 
