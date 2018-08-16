@@ -346,7 +346,19 @@ There is no option to lead "simulation_2" because "simulation_3" provides more i
 
 The "dif_poly" function allows us to check DIF for several items and one covariate in one database. Now, suppose we have several databases with the same variables (i.e. items) and for each database several covariate. For one item, we wish to have a global overview of whether DIF is observed in each database and for each covariate. The "test_item_int" and "test_item" functions provide this global overview.
 
-The "test_item_int" function takes in argument (...) 
+The "test_item_int" function takes the following arguments :
+
+> "dataList", a list containaing all the regarded databases and their respective names ; "dataList" must be a list and their elements need to have a name ; 
+
+> "item", the item for which we wish to test DIF according to the covariate in all databases and for all covariates ; "item" must be a character string ;
+
+> "itemlist", the list of items to which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
+
+> "covariates" is a dataframe : each column provides the covariates of one database of "dataList" ; then, covariates includes as many columns as studied databases ; the first line of "covariates" provides the names of the databases and each column
+
+"diffvar", the covariate from which we differenciate the item "item" ; "diffvar" must be a character string ;
+
+> "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
 
 
 
