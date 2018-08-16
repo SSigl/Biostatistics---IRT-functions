@@ -803,12 +803,12 @@ simulation = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar=NULL,item
 test_item_int = function(dataList,item,itemlist,covariates,constraint,eps){
   n = length(dataList)
   names = names(dataList)
-  covar = as.character(covariates[,names[[1]]][1])
   study = names[[1]]
+  covar = levels(as.factor(covariates[[study]]))[1]
   result_item = data.frame("covar"=c(covar),"study" = c(study),"LRT"=c(0),"chisq"=c(0),"pvalue"=c(0))
   for(i in 1:n){
     study = names[[i]]
-    covar = levels(covariates[,study])
+    covar = levels(as.factor(covariates[[study]]))
     m= length(covar)
     for(j in 1:m){
       diffvar = covar[j]
@@ -820,7 +820,8 @@ test_item_int = function(dataList,item,itemlist,covariates,constraint,eps){
         data_int = data.frame("covar"=c(diffvar),"study"=c(study),"LRT"=result[,"LRT"],"chisq"=result[,"chisq"],"pvalue"=result[,"pvalue"])  
       }
       result_item = rbind(result_item,data_int)
-    }}
+    }
+    }
   result_item = result_item[-1,]
   rownames(result_item) <- NULL
   result_item$test <- (result_item$pvalue < eps)  
@@ -911,7 +912,7 @@ study_4 = select_not_na(study_4)
 study_5 = select_not_na(study_5)
 
 datalist = list("study_1" = study_1,"study_2" =study_2,"study_3" =study_3,"study_4" =study_4,"study_5" =study_5)
-covariables = data.frame("study_1"=c("Sex","over64"),"study_2"=c("Sex","over48"),"study_3"=c("Sex","over72"),"study_4"=c("Sex","over76"),"study_5"=c("Sex","over51"))
+covariables = list("study_1"=c("Sex","over64"),"study_2"=c("Sex","over48"),"study_3"=c("Sex","over72"),"study_4"=c("Sex","over76"),"study_5"=c("Sex","over51"))
 
 # sub_scales
 healthBehaviour =paste("Heiq",c(1,9,13,19),sep="")
