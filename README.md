@@ -354,11 +354,11 @@ The "test_item_int" function takes the following arguments :
 
 > "itemlist", the list of items to which we will restrain the dataframe to apply the gpcm model ; "itemlist" must be a vector of character strings ; note that necessarily, "item" belongs to "itemlist" ;
 
-> "covariates" is a dataframe : each column provides the covariates of one database of "dataList" ; then, covariates includes as many columns as studied databases ; the first line of "covariates" provides the names of the databases and each column
-
-"diffvar", the covariate from which we differenciate the item "item" ; "diffvar" must be a character string ;
+> "covariates", the list of covariates according to which we wish to test DIF for item "item", for each database in "dataList" ; "covariates" must be a list of same length of "dataList" ; the elements of covariates must have the same names as "dataList" ;
 
 > "constraint", which precise which model we wish to apply ; "constraint" might be equal to "rasch", "1PL" or "gpcm" (c.f. more details in the description of the "expected_value" function) ;
+
+> "eps" stands for "epsilon" ; it indicates the threshold for the log-likelihood ratio test we lead for each covariate in each database : if the p-value is smaller than this threshold then we consider that DIF is indeed observed.
 
 
 
