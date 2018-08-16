@@ -740,7 +740,7 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
     lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
   }  
   lines(tab$level_R,tab$S,col="blue",lwd=2)
-  legend("bottomright",legend=c("real success rate","sim success rate"),col=c("blue","red"),lty=c(1,3),cex=0.6)
+  legend("bottomright",legend=c("real success rate","sim success rate"),col=c("blue","red"),lty=c(1,3),cex=0.5)
 }
 
 simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE){
