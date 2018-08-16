@@ -207,12 +207,13 @@ dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
         result_LRT[i,] = result_dif[["LRT"]]
         result_parameters = append(result_parameters,list(result_dif[["parameters"]]))
       }else{
+        result_LRT[i,] = NA
         na_items = c(na_items,items[i])
       }
     }
-    options(warn=-1) 
-    names(result_parameters) = items[-which(items %in% na_items)]
+    options(warn=+1) 
     rownames(result_LRT)=items
+    names(result_parameters) = items[-which(items %in% na_items)]
     result = list("LRT"=result_LRT,"parameters"=result_parameters)
     return(result)
   }
