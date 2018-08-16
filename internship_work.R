@@ -187,6 +187,7 @@ dif_poly_int = function(data,item,itemlist,diffvar,constraint,toPlot=FALSE){
 
 dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
   len = length(items)
+  na_items = c()
   if(toPlot){
     par(mfrow=select_par(len))
     options(warn=-1) 
@@ -205,10 +206,12 @@ dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
       if(is.na(result_dif)==FALSE){
         result_LRT[i,] = result_dif[["LRT"]]
         result_parameters = append(result_parameters,list(result_dif[["parameters"]]))
+      }else{
+        na_items = c(na_items,items[i])
       }
     }
     options(warn=-1) 
-    names(result_parameters) = items
+    names(result_parameters) = items[-which(items %in% na_items)]
     rownames(result_LRT)=items
     result = list("LRT"=result_LRT,"parameters"=result_parameters)
     return(result)
