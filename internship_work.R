@@ -835,7 +835,7 @@ test_item_int = function(dataList,item,itemlist,covariates,constraint,eps){
 }
 
 
-test_item = function(dataList,items,itemlist,covariates,constraint,eps){
+test_item = function(dataList,items,titemlist,covariates,constraint,eps){
   result_Tot = list()
   len = length(items)
   for(i in 1:len){
@@ -849,7 +849,7 @@ test_item = function(dataList,items,itemlist,covariates,constraint,eps){
 
 
 #===================================================================================#
-select_aleat = function(data,refvar,n){
+select_random = function(data,refvar,n){
   values = levels(as.factor(data[,refvar]))  
   p=length(values)
   var_names = paste(refvar,1:p,sep="_")
@@ -868,10 +868,6 @@ select_aleat = function(data,refvar,n){
 #===================================================================================#
 
 #===================================================================================#
-select_items = function(data,expr){
-  l = grep(paste(expr,"",sep=""), colnames(data))
-  return(l)
-}
 
 select_not_na = function(data){
   data <- data[,colSums(is.na(data)) != nrow(data)]
