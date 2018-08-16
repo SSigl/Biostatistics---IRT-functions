@@ -893,8 +893,8 @@ select_par = function(n){
 
 #===================================================================================#
 # importation of the dataset
-setwd("/Users/SuzanneSigalla/Documents/ENSAE/2A/Stage/Travail stage/vraie base")
-data <- read.csv("heiq.csv")
+#setwd("your_path")
+#data <- read.csv("heiq.csv")
 
 # creation and transformation of the databases
 study_1 <- subset(data,data$study==1)
