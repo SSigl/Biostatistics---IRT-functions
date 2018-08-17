@@ -233,13 +233,17 @@ If we wish to apply the whole operation to several items, we might use the "simu
 
 The "simulation_3" functions re-use the previous simulation we wrote ; we use this "simulation_3" function if we want to lead specific simulations and to display all their results side by side. The "simulation_3" has the same arguments as the "simulation_2" function. The difference between "simulation_2" and "simulation_3" is that "simulation_2" will only lead the simulation for the original item "item" and the differenciated items created from "item" and the differenciating variable "diffvar", whereas "simulation_3" will in addition lead the simulation for the items in itemlist which are not the item "item". Then, the "simulation_3" function will display the result of the simulation for all items in itemlist and for the differenciated items. 
 
-# To plot simulations and success rates of differenciated variables in the same graph : "simulation_4_int" (intermediary function) and "simulation_4"
+# To plot simulations and success rates of differenciated variables in the same graph - option to extract plot : "simulation_4_int" (intermediary function) and "simulation_4"
 
 The last simulation functions we wrote may be used to plot in the same graph the real and simulated success rates of an item, as well as the real success rates of differenciated items created from the item and a differenciating variable. These functions do not present any substantial changes in relation to the previous functions we wrote : the "simulation_4_int" function does follow exactly the same steps as the "simulation_2_int" ans "simulation_2" function, but it was necessary to write a new function to obtain the desired result because plot-objects in R are difficult to modify once they are plot, so we needed to directly work on the plot, and so to write another function. 
 
-The "simulation_4_int" function has the same arguments as the "simulation_2" function. The "simulation_4_int" function returns a single graph with the real success rate of an original item, the simulated success rate of this original item, and the real success rates of differenciated items created from the original item and a differentiating variable. 
+The "simulation_4_int" function has the same arguments as the "simulation_2" function and an additional optional parameter, "display", which is by default equal to "TRUE". By default, the "simulation_4_int" function returns a single graph with the real success rate of an original item, the simulated success rate of this original item, and the real success rates of differenciated items created from the original item and a differentiating variable ; if display is set to "FALSE", the "simulation_4_int" function returns a dataframe with the coordinates of all the plots (the real success rates of the original and differenciate items plus the simulated success rate of the original item) ; rather than plotting them, it allows you to export those plots.
 
-If we wish to repeat "simulation_4_int" function on several items instead of only one, we use the "simulation_4" function which calls the "simulation_4_int" function for each item in "items", which is a vector of character strings. 
+If we wish to repeat "simulation_4_int" function on several items instead of only one, we use the "simulation_4" function which calls the "simulation_4_int" function for each item in "items", which is a vector of character strings. By default, the "simulation_4" function plots all graphs side by side for each item in "items" ; if "display" is set to "FALSE", the "simulation_4" function returns a list of dataframe, one for each item in "items", each dataframe containing the coordinates of all the regarded plot. 
+
+This "simulation_4" function may be used for only one item in the "items" argument, so we will not use the "simulation_4_int" function, which is only an intermediary function useful in the "simulation_4" function, and we will only use "simulation_4".
+
+
 
 # To apply a simulation to a database with one differenciated item : "simulation_5_int" (intermediary function) and "simulation_5"
 
