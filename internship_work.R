@@ -491,7 +491,7 @@ simulation_3 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
 
 
 #===================================================================================#
-simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
+simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,display=TRUE){
   # initializing - creation of score
   result = differenciate(data,item,diffvar)
   data = result$data
@@ -509,17 +509,18 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
     data$score <- quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp)
   }
   R = as.integer(levels(factor(data$score)))
-  tab = data.frame(level_R=R,S = rep(0,length(R)))
+  tab = data.frame(level_R=R,S=rep(0,length(R)))
   for(i in 1:length(R)){
     data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
     tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
   }
-  
   # plot real score
   y_inf = min(data[, itemlist],na.rm=TRUE)
   y_sup = max(data[, itemlist],na.rm=TRUE)
   if(sc_gp>1){x_lab="regathered score"}else{x_lab = "score"}
-  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Simulation and differenciation for the",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
+  if(display){plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Simulation and differenciation for the",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))}
+  # rename 
+  colnames(tab)[colnames(tab)=="S"] <- paste("real_score",item,sep="_")
   
   # model
   fit = gpcm(data[,c(itemlist)],constraint=constraint)
@@ -578,18 +579,18 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
     if(sc_gp >1){
       simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)
     }
-    R = as.integer(levels(factor(simul_data$score)))
-    tab_b = data.frame(level_R=R,S = rep(0,length(R)))
+    tab$S <- rep(0,length(R))
     for(i in 1:length(R)){
       data_r = subset(simul_data,simul_data$score == as.numeric(R[i]),select=item)
-      tab_b[i,][2] <- sum(data_r[,item])/dim(data_r)[1]
+      tab[i,"S"] <- sum(data_r[,item])/dim(data_r)[1]
     }
-    lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
+    if(display){
+    lines(tab$S,lty = 3,col="red")}
+    colnames(tab)[colnames(tab)=="S"] <- paste("simul_score",item,sep="_")
   }
-  lines(tab$level_R,tab$S,col="blue",lwd=2)
+  if(display){lines(tab$level_R,tab[,2],col="blue",lwd=2)}
   
   # sucess rate for the differenciated items
-  R = as.integer(levels(factor(data$score)))
   # list of colors to plot the differenciated items
   if(len<10){
     list_colors = c("green3","yellow3","pink","orange","purple","cyan","magenta","gray","aquamarine","coral")
@@ -603,27 +604,40 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
   }
   for(l in 1:len){
     item = diff_names[l]
-    tab_b = data.frame(level_R=R,S = rep(0,length(R)))
+    tab$S <- rep(0,length(R))
     for(i in 1:length(R)){
       data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
-      tab_b[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
+      tab[i,"S"] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
     }
-    lines(tab_b$level_R,tab_b$S,lty = 1,col=list_colors[l])
+    lines(tab$S,lty = 1,col=list_colors[l])
+    colnames(tab)[colnames(tab)=="S"] <- paste("real_score",item,sep="_")
   }
+  if(display){
   legend = paste(c("real rate for item","sim rate for item"),all_items[1],sep=" ")
   legend = c(legend,paste("real rate for item",diff_names,sep=" "))
   list_colors = c("blue","red",list_colors[1:len])
-  legend("bottomright",legend=legend,col=list_colors,lty=c(1,3,rep(1,len)),cex=0.5)
+  legend("bottomright",legend=legend,col=list_colors,lty=c(1,3,rep(1,len)),cex=0.5)}else{
+  return(tab)}
 }
 
-simulation_4 = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar){
+simulation_4 = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar,display=TRUE){
   len = length(items)
+  if(display){
   par(mfrow=select_par(len))
   for(i in 1:len){
     simulation_4_int(data,items[i],itemlist,constraint,B,sc_gp,diffvar)
     if(i<len & len > 9){
       invisible(readline(prompt="Press [enter] to continue"))}
+  }}else{
+  tab = paste("tab",1:len,sep="_")
+  for(i in 1:len){
+    assign(tab[i],simulation_4_int(data,items[i],itemlist,constraint,B,sc_gp,diffvar,display))
   }
+  result = lapply(tab,get)
+  names(result) <- items
+  return(result)
+  }
+  
 }
 #===================================================================================#
 
