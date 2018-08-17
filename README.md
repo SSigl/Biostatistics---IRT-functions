@@ -393,7 +393,7 @@ The argument of "select_par" is "n", the number of displayed plots.
 
 # To remove the rows which only has NA answers : "select_not_na" (intermediary function)
 
-This function which takes a dataset "data" in argument removes in this dataset the lines with only "NA" answers.
+This function which takes a dataset "data" in argument removes in this dataset the lines with only "NA" answers, and returns the modified dataset.
 
 
 
