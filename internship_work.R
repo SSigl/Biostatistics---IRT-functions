@@ -263,7 +263,7 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1){
       values = as.integer(levels(factor(data[,item_B])))
       n_values = length(values)
       # extract and calculate useful entities : discrimination, eta, beta, quotient
-      parameters = as.data.frame(coef[item_B,])
+      if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}
       parameters["Catgr.0",] <-0
       parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
       colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -372,7 +372,7 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1){
         values = as.integer(levels(factor(data[,item_B])))
         n_values = length(values)
         # extract and calculate useful entities : discrimination, eta, beta, quotient
-        parameters = as.data.frame(coef[item_B,])
+        if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}     
         parameters["Catgr.0",] <-0
         parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
         colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -543,7 +543,7 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
       values = as.integer(levels(factor(data[,item_B])))
       n_values = length(values)
       # extract and calculate useful entities : discrimination, eta, beta, quotient
-      parameters = as.data.frame(coef[item_B,])
+      if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}
       parameters["Catgr.0",] <-0
       parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
       colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -694,7 +694,7 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
         values = as.integer(levels(factor(data[,item_B])))
         n_values = length(values)
         # extract and calculate useful entities : discrimination, eta, beta, quotient
-        parameters = as.data.frame(coef[item_B,])
+        if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}
         parameters["Catgr.0",] <-0
         parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
         colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
