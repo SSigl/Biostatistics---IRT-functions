@@ -586,11 +586,12 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
     }
     if(display){
     lines(tab$S,lty = 3,col="red")}
-    colnames(tab)[colnames(tab)=="S"] <- paste("simul_score",item,sep="_")
+    colnames(tab)[colnames(tab)=="S"] <- paste("simul_score",b,item,sep="_")
   }
   if(display){lines(tab$level_R,tab[,2],col="blue",lwd=2)}
   
   # sucess rate for the differenciated items
+  if(display){
   # list of colors to plot the differenciated items
   if(len<10){
     list_colors = c("green3","yellow3","pink","orange","purple","cyan","magenta","gray","aquamarine","coral")
@@ -612,7 +613,6 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
     lines(tab$S,lty = 1,col=list_colors[l])
     colnames(tab)[colnames(tab)=="S"] <- paste("real_score",item,sep="_")
   }
-  if(display){
   legend = paste(c("real rate for item","sim rate for item"),all_items[1],sep=" ")
   legend = c(legend,paste("real rate for item",diff_names,sep=" "))
   list_colors = c("blue","red",list_colors[1:len])
@@ -629,13 +629,13 @@ simulation_4 = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar,display
     if(i<len & len > 9){
       invisible(readline(prompt="Press [enter] to continue"))}
   }}else{
-  tab = paste("tab",1:len,sep="_")
-  for(i in 1:len){
-    assign(tab[i],simulation_4_int(data,items[i],itemlist,constraint,B,sc_gp,diffvar,display))
-  }
-  result = lapply(tab,get)
+  if(len > 1){
+  result=lapply(items,simulation_4_int,data=data,itemlist=itemlist,constraint=constraint,B=B,sc_gp=sc_gp,diffvar=diffvar,display=display)
   names(result) <- items
   return(result)
+  }else{
+    return(simulation_4_int(data,items[1],itemlist,constraint,B,sc_gp,diffvar,display)) 
+  }
   }
   
 }
@@ -909,8 +909,8 @@ select_par = function(n){
 
 #===================================================================================#
 # importation of the dataset
-#setwd("your_path")
-#data <- read.csv("heiq.csv")
+setwd("your_path")
+data <- read.csv("heiq.csv")
 
 # creation and transformation of the databases
 study_1 <- subset(data,data$study==1)
