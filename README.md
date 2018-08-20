@@ -392,7 +392,7 @@ The "select_random" function returns a dataframe which merges all sampled databa
 This function is used many times in the functions we previously described. It is useful when we have to display plots side by side and to still be able to see it all at the same time.
 The argument of "select_par" is "n", the number of displayed plots.
 
-# To remove the rows which only has NA answers : "select_not_na" (intermediary function)
+# To remove the rows which only have NA answers : "select_not_na" (intermediary function)
 
 This function which takes a dataset "data" in argument removes in this dataset the lines with only "NA" answers, and returns the modified dataset.
 
