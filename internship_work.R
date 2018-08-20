@@ -123,14 +123,14 @@ regather = function(data,item,diffvar){
 
 
 #===================================================================================#
-differenciate = function(data,item,diffvar){
+split = function(data,item,diffvar){
   # initializing
   data = subset(data,is.na(data[,diffvar])==FALSE)
   data = regather(data,item,diffvar) 
   level = levels(as.factor(data[,c(diffvar)])) 
   n = length(level) 
   diff_names = paste(item,level,sep="_")
-  # create differenciated variables
+  # create splitd variables
   for(i in 1:n){
     data$var <- data[,c(item)]
     data$var[data[,c(diffvar)] != level[i]] <- NA 
@@ -145,21 +145,21 @@ differenciate = function(data,item,diffvar){
 
 #===================================================================================#
 dif_poly_int = function(data,item,itemlist,diffvar,constraint,toPlot=FALSE){
-  # initializing - creating differenciate variables
-  result = differenciate(data,item,diffvar)
+  # initializing - creating split variables
+  result = split(data,item,diffvar)
   data = result$data
   var_names = result$diff_names
   n=length(var_names)
   # model with original item
   fit0 = gpcm(data[,c(itemlist)],constraint=constraint)
-  # model with differenciated items
+  # model with splitd items
   difflist = c(itemlist[-which(itemlist==item)],var_names)
   fit1 = gpcm(data[,c(difflist)],constraint=constraint)
   parameters = as.data.frame(fit1$coefficients)
   
   # with or without plot
   if(toPlot==TRUE){
-    # expected value for differenciated items
+    # expected value for splitd items
     for(i in 1:n){
       assign(paste("data_pr",i,sep="_"),expected_value(data=data,item=var_names[i],itemlist=difflist,constraint))
     }
@@ -308,7 +308,7 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1){
     lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
   }
   lines(tab$level_R,tab$S,col="blue",lwd=2)
-  legend("bottomright",legend=c("real success rate","sim success rate"),col=c("blue","red"),lty=c(1,3),cex=0.6)
+  legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.6)
 }
 
 simulation_1 = function(data,items,itemlist,constraint,B,sc_gp=1){  
@@ -437,12 +437,12 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1){
     lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
   }
   lines(tab$level_R,tab$S,col="blue",lwd=2)
-  legend("bottomright",legend=c("real success rate","sim success rate"),col=c("blue","red"),lty=c(1,3),cex=0.6)
+  legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.6)
 }
 
 
 simulation_2 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE){
-  result = differenciate(data,item,diffvar)
+  result = split(data,item,diffvar)
   data = result$data
   diff_names = result$diff_names
   len = length(diff_names)
@@ -450,7 +450,7 @@ simulation_2 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,unq = TR
   par(mfrow=select_par(len+1))}
   # simulation for the original item
   simulation_1(data=data,item,itemlist=itemlist,constraint=constraint,B=B,sc_gp=sc_gp)
-  # simulation for the differenciated items
+  # simulation for the splitd items
   k = which(itemlist == item)
   itemlist = itemlist[-k]
   for(i in 1:len){
@@ -493,7 +493,7 @@ simulation_3 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
 #===================================================================================#
 simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,display=TRUE){
   # initializing - creation of score
-  result = differenciate(data,item,diffvar)
+  result = split(data,item,diffvar)
   data = result$data
   diff_names = result$diff_names
   len = length(diff_names)
@@ -590,9 +590,9 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
   }
   if(display){lines(tab$level_R,tab[,2],col="blue",lwd=2)}
   
-  # sucess rate for the differenciated items
+  # sucess rate for the splitd items
   if(display){
-  # list of colors to plot the differenciated items
+  # list of colors to plot the splitd items
   if(len<10){
     list_colors = c("green3","yellow3","pink","orange","purple","cyan","magenta","gray","aquamarine","coral")
   }else{
@@ -762,18 +762,18 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
     lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
   }  
   lines(tab$level_R,tab$S,col="blue",lwd=2)
-  legend("bottomright",legend=c("real success rate","sim success rate"),col=c("blue","red"),lty=c(1,3),cex=0.5)
+  legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.5)
 }
 
 simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE){
   # first differenciation
-  result = differenciate(data,item_dif,diffvar)
+  result = split(data,item_dif,diffvar)
   data = result$data
   dif_list=  result$diff_names
   itemlist = c(itemlist[-which(itemlist==item_dif)])
   
   # second differenciation
-  result = differenciate(data,item,diffvar)
+  result = split(data,item,diffvar)
   data=result$data
   to_dif_list = result$diff_names
   len = length(to_dif_list)
@@ -785,7 +785,7 @@ simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar
     par(mfrow=select_par(len+1))}
   # simulation for the original item
   simulation_2_int(data=data,item=item,itemlist=itemlist,diff_names=dif_list,constraint=constraint, B=B,sc_gp=sc_gp)
-  # simulation for the differenciated items
+  # simulation for the splitd items
   itemlist = itemlist[-which(itemlist == item)]
   for(i in 1:len){
     simulation_5_int(data=data,item=to_dif_list[i],itemlist=itemlist,dif_list=dif_list,to_dif_list=to_dif_list,level=level,constraint=constraint,B=B,sc_gp=sc_gp)
