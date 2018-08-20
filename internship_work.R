@@ -115,7 +115,7 @@ regather = function(data,item,diffvar){
     }
     k = which(colnames(data)==item)
     data <- data[,-k]
-    colnames(data)[colnames(datpa)=="var"] <- item
+    colnames(data)[colnames(data)=="var"] <- item
   }
   return(data)
 }
