@@ -224,7 +224,7 @@ dif_poly = function(data,items,itemlist,diffvar,constraint,toPlot=FALSE){
 
 
 #===================================================================================#
-simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1){
+simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   # initialiazing -- creation of score -- re-level score
   data <- data[,c(itemlist)] 
   data$score <- apply(data,1,sum,na.rm = TRUE)
@@ -234,16 +234,18 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1){
   }
   R = as.integer(levels(factor(data$score)))
   tab = data.frame(level_R=R,S = rep(0,length(R)))
-  # calculate real sucess rate
+  # calculate observed mean
   for(i in 1:length(R)){
     data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
     tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
   }
-  # plot real sucess rate
+  # plot observed mean
   y_inf = min(data[,itemlist],na.rm=TRUE)
   y_sup = max(data[,itemlist],na.rm=TRUE)
-  if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}
-  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Sucess rate for item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
+  if(is.null(xlab)){if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}}
+  if(is.null(ylab)){ylab="mean"}
+  if(is.null(title)){title = paste("Mean for item",item,sep=" ")}
+  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab=ylab,main=title,col="blue",ylim=c(y_inf,y_sup))
   # model
   fit = gpcm(data[,c(itemlist)],constraint=constraint)
   coef = coef(fit)
@@ -308,14 +310,14 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1){
     lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
   }
   lines(tab$level_R,tab$S,col="blue",lwd=2)
-  legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.6)
+  if(legend){legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.6)}
 }
 
-simulation_1 = function(data,items,itemlist,constraint,B,sc_gp=1){  
+simulation_1 = function(data,items,itemlist,constraint,B,sc_gp=1,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){  
   len = length(items)
   par(mfrow=select_par(len))
   for(i in 1:len){
-    simulation_1_int(data=data,item=items[i],itemlist=itemlist,constraint=constraint,B=B,sc_gp=sc_gp)
+    simulation_1_int(data=data,item=items[i],itemlist=itemlist,constraint=constraint,B=B,sc_gp=sc_gp,xlab=xlab,ylab=ylab,title=title,legend=legend)
   }
 }
 #===================================================================================#
@@ -323,7 +325,7 @@ simulation_1 = function(data,items,itemlist,constraint,B,sc_gp=1){
 
 
 #===================================================================================#
-simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1){
+simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   # initializing - creation of score
   tot_list <- c(itemlist,diff_names)  
   data = subset(data,select=c(tot_list))
@@ -334,16 +336,18 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1){
   }
   R = as.integer(levels(factor(data$score)))
   tab = data.frame(level_R=R,S = rep(0,length(R)))
-  # calculate real sucess rate
+  # calculate observed mean
   for(i in 1:length(R)){
     data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
     tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
   }
-  # plot real sucess rate
+  # plot observed mean
   y_inf = min(data[,tot_list],na.rm=TRUE)
   y_sup = max(data[, tot_list],na.rm=TRUE)
-  if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}
-  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Sucess rate for item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
+  if(is.null(xlab)){if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}}
+  if(is.null(ylab)){ylab="mean"}
+  if(is.null(title)){title = paste("Mean for item",item,sep=" ")}
+  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab=ylab,main=title,col="blue",ylim=c(y_inf,y_sup))
   # model
   fit = gpcm(data[,c(tot_list)],constraint=constraint)
   coef = coef(fit)
@@ -437,11 +441,11 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1){
     lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
   }
   lines(tab$level_R,tab$S,col="blue",lwd=2)
-  legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.6)
+  if(legend){legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.6)}
 }
 
 
-simulation_2 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE){
+simulation_2 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   result = split(data,item,diffvar)
   data = result$data
   diff_names = result$diff_names
@@ -449,21 +453,21 @@ simulation_2 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,unq = TR
   if(unq){
   par(mfrow=select_par(len+1))}
   # simulation for the original item
-  simulation_1(data=data,item,itemlist=itemlist,constraint=constraint,B=B,sc_gp=sc_gp)
+  simulation_1(data=data,item,itemlist=itemlist,constraint=constraint,B=B,sc_gp=sc_gp,xlab=xlab,ylab=ylab,title=title,legend=legend)
   # simulation for the splitd items
   k = which(itemlist == item)
   itemlist = itemlist[-k]
   for(i in 1:len){
-    simulation_2_int(data=data,item=diff_names[i],itemlist=itemlist,diff_names=diff_names,constraint=constraint,B=B,sc_gp=sc_gp)
+    simulation_2_int(data=data,item=diff_names[i],itemlist=itemlist,diff_names=diff_names,constraint=constraint,B=B,sc_gp=sc_gp,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE)
   }
 }
 
-simulation_2_tot = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar){
+simulation_2_tot = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   len_1 = length(items)
   len_2 = length(levels(as.factor(data[,diffvar])))
   par(mfrow=select_par(len_2+1))
   for(i in 1:len_1){
-    simulation_2(data,items[i],itemlist,constraint,B,sc_gp,diffvar)
+    simulation_2(data,items[i],itemlist,constraint,B,sc_gp,diffvar,xlab=xlab,ylab=ylab,title=title,legend=legend)
     if(i<len_1){
       invisible(readline(prompt="Press [enter] to continue"))}
   }
@@ -474,14 +478,14 @@ simulation_2_tot = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar){
 
 
 #===================================================================================#
-simulation_3 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
+simulation_3 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   n = length(itemlist)
   len = length(levels(as.factor(data[,diffvar]))) + n
   par(mfrow=select_par(len))
-  simulation_2(data,item,itemlist,constraint,B,sc_gp,diffvar,unq=FALSE)
+  simulation_2(data,item,itemlist,constraint,B,sc_gp,diffvar,unq=FALSE,xlab=xlab,ylab=ylab,title=title,legend=legend)
   for(i in 1:n){
     if(itemlist[i]!=item){
-      simulation_1_int(data=data,item=itemlist[i],itemlist,constraint=constraint,B=B,sc_gp=sc_gp)
+      simulation_1_int(data=data,item=itemlist[i],itemlist,constraint=constraint,B=B,sc_gp=sc_gp,xlab=xlab,ylab=ylab,title=title,legend=legend)
     }
   }
 }
@@ -491,7 +495,7 @@ simulation_3 = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar){
 
 
 #===================================================================================#
-simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,display=TRUE){
+simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,display=TRUE,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   # initializing - creation of score
   result = split(data,item,diffvar)
   data = result$data
@@ -514,13 +518,16 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
     data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
     tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
   }
-  # plot real score
-  y_inf = min(data[, itemlist],na.rm=TRUE)
-  y_sup = max(data[, itemlist],na.rm=TRUE)
-  if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}
-  if(display){plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="mean",main=paste("Simulation and differenciation for the",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))}
+  # plot observed rate if display
+  if(display){
+    y_inf = min(data[, itemlist],na.rm=TRUE)
+    y_sup = max(data[, itemlist],na.rm=TRUE)
+    if(is.null(xlab)){if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}}
+    if(is.null(ylab)){ylab="mean"}
+    if(is.null(title)){title=paste("Simulation and differenciation for the",item,sep=" ")}
+    plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="mean",main=title,col="blue",ylim=c(y_inf,y_sup))}
   # rename 
-  colnames(tab)[colnames(tab)=="S"] <- paste("observed_score",item,sep="_")
+  colnames(tab)[colnames(tab)=="S"] <- paste("observed_mean",item,sep="_")
   
   # model
   fit = gpcm(data[,c(itemlist)],constraint=constraint)
@@ -586,11 +593,11 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
     }
     if(display){
     lines(tab$S,lty = 3,col="red")}
-    colnames(tab)[colnames(tab)=="S"] <- paste("simul_score",b,item,sep="_")
+    colnames(tab)[colnames(tab)=="S"] <- paste("simul_mean",b,item,sep="_")
   }
   if(display){lines(tab$level_R,tab[,2],col="blue",lwd=2)}
   
-  # sucess rate for the splitd items
+  # mean for the splitd items
   if(display){
   # list of colors to plot the splitd items
   if(len<10){
@@ -611,21 +618,22 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
       tab[i,"S"] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
     }
     lines(tab$S,lty = 1,col=list_colors[l])
-    colnames(tab)[colnames(tab)=="S"] <- paste("real_score",item,sep="_")
+    colnames(tab)[colnames(tab)=="S"] <- paste("observed_mean",item,sep="_")
   }
-  legend = paste(c("real rate for item","sim rate for item"),all_items[1],sep=" ")
-  legend = c(legend,paste("real rate for item",diff_names,sep=" "))
+  if(legend){
+  legend = paste(c("observed mean for item","sim rate for item"),all_items[1],sep=" ")
+  legend = c(legend,paste("observed mean for item",diff_names,sep=" "))
   list_colors = c("blue","red",list_colors[1:len])
-  legend("bottomright",legend=legend,col=list_colors,lty=c(1,3,rep(1,len)),cex=0.5)}else{
+  legend("bottomright",legend=legend,col=list_colors,lty=c(1,3,rep(1,len)),cex=0.5)}}else{
   return(tab)}
 }
 
-simulation_4 = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar,display=TRUE){
+simulation_4 = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar,display=TRUE,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   len = length(items)
   if(display){
   par(mfrow=select_par(len))
   for(i in 1:len){
-    simulation_4_int(data,items[i],itemlist,constraint,B,sc_gp,diffvar)
+    simulation_4_int(data,items[i],itemlist,constraint,B,sc_gp,diffvar,xlab=xlab,ylab=ylab,title=title,legend=legend)
     if(i<len & len > 9){
       invisible(readline(prompt="Press [enter] to continue"))}
   }}else{
@@ -645,7 +653,7 @@ simulation_4 = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar,display
 
 
 #===================================================================================#
-simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constraint,B,sc_gp){
+simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constraint,B,sc_gp=1,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   # initializing - creation of score
   tot_list <- c(itemlist,dif_list,to_dif_list)  
   data = subset(data,select=c(tot_list))
@@ -656,16 +664,18 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
   }
   R = as.integer(levels(factor(data$score)))
   tab = data.frame(level_R=R,S = rep(0,length(R)))
-  # calculate real sucess rate
+  # calculate observed mean
   for(i in 1:length(R)){
     data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
     tab[i,][2] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
   }
-  # plot real sucess rate
+  # plot observed mean
   y_inf = min(data[,tot_list],na.rm=TRUE)
   y_sup = max(data[, tot_list],na.rm=TRUE)
-  if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}
-  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Sucess rate for item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
+  if(is.null(xlab)){if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}}
+  if(is.null(ylab)){ylab="observed mean"}
+  if(is.null(title)){title=paste("Mean for item",item,sep=" ")}
+  plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab=ylab,main=title,col="blue",ylim=c(y_inf,y_sup))
   # model
   fit = gpcm(data[,c(tot_list)],constraint=constraint)
   coef = coef(fit)
@@ -762,10 +772,10 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
     lines(tab_b$level_R,tab_b$S,lty = 3,col="red")
   }  
   lines(tab$level_R,tab$S,col="blue",lwd=2)
-  legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.5)
+  if(legend){legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.5)}
 }
 
-simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE){
+simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE,xlab=xlab,ylab=ylab,title=title,legend=legend){
   # first differenciation
   result = split(data,item_dif,diffvar)
   data = result$data
@@ -784,11 +794,11 @@ simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar
   if(unq){
     par(mfrow=select_par(len+1))}
   # simulation for the original item
-  simulation_2_int(data=data,item=item,itemlist=itemlist,diff_names=dif_list,constraint=constraint, B=B,sc_gp=sc_gp)
+  simulation_2_int(data=data,item=item,itemlist=itemlist,diff_names=dif_list,constraint=constraint, B=B,sc_gp=sc_gp,xlab=xlab,ylab=ylab,title=title,legend=legend)
   # simulation for the splitd items
   itemlist = itemlist[-which(itemlist == item)]
   for(i in 1:len){
-    simulation_5_int(data=data,item=to_dif_list[i],itemlist=itemlist,dif_list=dif_list,to_dif_list=to_dif_list,level=level,constraint=constraint,B=B,sc_gp=sc_gp)
+    simulation_5_int(data=data,item=to_dif_list[i],itemlist=itemlist,dif_list=dif_list,to_dif_list=to_dif_list,level=level,constraint=constraint,B=B,xlab=xlab,ylab=ylab,title=title,legend=legend)
   }
 }
 
@@ -801,17 +811,17 @@ simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar
 
 
 #===================================================================================#
-simulation = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar=NULL,item_dif=NULL,samePlot=FALSE){
+simulation = function(data,items,itemlist,constraint,B,sc_gp=1,diffvar=NULL,item_dif=NULL,samePlot=FALSE,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   if(is.null(diffvar)==FALSE){
     if(is.null(item_dif)==FALSE){
-      simulation_5(data,item,item_dif,itemlist,constraint,B,sc_gp,diffvar)
+      simulation_5(data,item,item_dif,itemlist,constraint,B,sc_gp,diffvar,xlab=xlab,ylab=ylab,title=title,legend=legend)
     }else{
     if(samePlot==TRUE){
-      simulation_4(data,items,itemlist,constraint,B,sc_gp,diffvar)
+      simulation_4(data,items,itemlist,constraint,B,sc_gp,diffvar,xlab=xlab,ylab=ylab,title=title,legend=legend)
     }else{
-      simulation_3(data,items,itemlist,constraint,B,sc_gp,diffvar)}}
+      simulation_3(data,items,itemlist,constraint,B,sc_gp,diffvar,xlab=xlab,ylab=ylab,title=title,legend=legend)}}
   }else{
-    simulation_1(data,items,itemlist,constraint,B,sc_gp)  
+    simulation_1(data,items,itemlist,constraint,B,sc_gp,xlab=xlab,ylab=ylab,title=title,legend=legend)  
   }
 }
 #===================================================================================#
@@ -918,7 +928,7 @@ recode_var = function(data,list_items){
 
 #===================================================================================#
 # importation of the dataset
-#setwd("your_path")
+#setwd("yoyr_path")
 #data <- read.csv("heiq.csv")
 
 # list of all items
