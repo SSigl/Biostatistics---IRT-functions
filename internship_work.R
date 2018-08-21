@@ -85,7 +85,7 @@ expected_value = function(data,item,itemlist,constraint){
 
 
 #===================================================================================#
-regather = function(data,item,diffvar){
+collapse = function(data,item,diffvar){
   # levels of the diffvar 
   level = levels(as.factor(data[,c(diffvar)]))
   n = length(level)
@@ -126,7 +126,7 @@ regather = function(data,item,diffvar){
 split = function(data,item,diffvar){
   # initializing
   data = subset(data,is.na(data[,diffvar])==FALSE)
-  data = regather(data,item,diffvar) 
+  data = collapse(data,item,diffvar) 
   level = levels(as.factor(data[,c(diffvar)])) 
   n = length(level) 
   diff_names = paste(item,level,sep="_")
@@ -242,7 +242,7 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1){
   # plot real sucess rate
   y_inf = min(data[,itemlist],na.rm=TRUE)
   y_sup = max(data[,itemlist],na.rm=TRUE)
-  if(sc_gp>1){x_lab="regathered score"}else{x_lab = "score"}
+  if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}
   plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Sucess rate for item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
   # model
   fit = gpcm(data[,c(itemlist)],constraint=constraint)
@@ -263,7 +263,7 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1){
       values = as.integer(levels(factor(data[,item_B])))
       n_values = length(values)
       # extract and calculate useful entities : discrimination, eta, beta, quotient
-      if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}
+      parameters = as.data.frame(coef[item_B,])
       parameters["Catgr.0",] <-0
       parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
       colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -342,7 +342,7 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1){
   # plot real sucess rate
   y_inf = min(data[,tot_list],na.rm=TRUE)
   y_sup = max(data[, tot_list],na.rm=TRUE)
-  if(sc_gp>1){x_lab="regathered score"}else{x_lab = "score"}
+  if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}
   plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Sucess rate for item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
   # model
   fit = gpcm(data[,c(tot_list)],constraint=constraint)
@@ -372,7 +372,7 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1){
         values = as.integer(levels(factor(data[,item_B])))
         n_values = length(values)
         # extract and calculate useful entities : discrimination, eta, beta, quotient
-        if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}     
+        parameters = as.data.frame(coef[item_B,])
         parameters["Catgr.0",] <-0
         parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
         colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -517,10 +517,10 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
   # plot real score
   y_inf = min(data[, itemlist],na.rm=TRUE)
   y_sup = max(data[, itemlist],na.rm=TRUE)
-  if(sc_gp>1){x_lab="regathered score"}else{x_lab = "score"}
-  if(display){plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Simulation and differenciation for the",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))}
+  if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}
+  if(display){plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="mean",main=paste("Simulation and differenciation for the",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))}
   # rename 
-  colnames(tab)[colnames(tab)=="S"] <- paste("real_score",item,sep="_")
+  colnames(tab)[colnames(tab)=="S"] <- paste("observed_score",item,sep="_")
   
   # model
   fit = gpcm(data[,c(itemlist)],constraint=constraint)
@@ -664,7 +664,7 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
   # plot real sucess rate
   y_inf = min(data[,tot_list],na.rm=TRUE)
   y_sup = max(data[, tot_list],na.rm=TRUE)
-  if(sc_gp>1){x_lab="regathered score"}else{x_lab = "score"}
+  if(sc_gp>1){x_lab="collapsed score"}else{x_lab = "score"}
   plot(tab$level_R,tab$S,type="l",xlab=x_lab,ylab="sucess rate",main=paste("Sucess rate for item",item,sep=" "),col="blue",ylim=c(y_inf,y_sup))
   # model
   fit = gpcm(data[,c(tot_list)],constraint=constraint)
@@ -694,7 +694,7 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
         values = as.integer(levels(factor(data[,item_B])))
         n_values = length(values)
         # extract and calculate useful entities : discrimination, eta, beta, quotient
-        if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}
+        parameters = as.data.frame(coef[item_B,])
         parameters["Catgr.0",] <-0
         parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
         colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -904,13 +904,26 @@ select_par = function(n){
     return(c(1,3))  
   }
 }
+
+recode_var = function(data,list_items){
+  for(item in list_items){
+    data[,item][data[,item] == 1 || data[,item]==2] <- 1
+    data[,item][data[,item] == 3 || data[,item]==4] <- 2
+  }
+  return(data)
+}
+
 #===================================================================================#
 
 
 #===================================================================================#
 # importation of the dataset
-setwd("your_path")
-data <- read.csv("heiq.csv")
+#setwd("your_path")
+#data <- read.csv("heiq.csv")
+
+# list of all items
+list_items = colnames(data)[grep("Heiq", colnames(data))]
+d_data = recode_var(data,list_items)
 
 # creation and transformation of the databases
 study_1 <- subset(data,data$study==1)
