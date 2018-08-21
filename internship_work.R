@@ -917,8 +917,8 @@ select_par = function(n){
 
 recode_var = function(data,list_items){
   for(item in list_items){
-    data[,item][data[,item] == 1 || data[,item]==2] <- 1
-    data[,item][data[,item] == 3 || data[,item]==4] <- 2
+    data[,item][data[,item] == 1 | data[,item]==2] <- 1
+    data[,item][data[,item] == 3 | data[,item]==4] <- 2
   }
   return(data)
 }
@@ -928,7 +928,7 @@ recode_var = function(data,list_items){
 
 #===================================================================================#
 # importation of the dataset
-#setwd("yoyr_path")
+#setwd("your_path")
 #data <- read.csv("heiq.csv")
 
 # list of all items
