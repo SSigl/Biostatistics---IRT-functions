@@ -798,7 +798,7 @@ simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar
   # simulation for the splitd items
   itemlist = itemlist[-which(itemlist == item)]
   for(i in 1:len){
-    simulation_5_int(data=data,item=to_dif_list[i],itemlist=itemlist,dif_list=dif_list,to_dif_list=to_dif_list,level=level,constraint=constraint,B=B,xlab=xlab,ylab=ylab,title=title,legend=legend)
+    simulation_5_int(data=data,item=to_dif_list[i],itemlist=itemlist,dif_list=dif_list,to_dif_list=to_dif_list,level=level,constraint=constraint,B=B,sc_gp=sc_gp,xlab=xlab,ylab=ylab,title=title,legend=legend)
   }
 }
 
