@@ -775,7 +775,7 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
   if(legend){legend("bottomright",legend=c("observed means","sim means"),col=c("blue","red"),lty=c(1,3),cex=0.5)}
 }
 
-simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE,xlab=xlab,ylab=ylab,title=title,legend=legend){
+simulation_5 = function(data,item,item_dif,itemlist,constraint,B,sc_gp=1,diffvar,unq = TRUE,xlab=NULL,ylab=NULL,title=NULL,legend=TRUE){
   # first differenciation
   result = split(data,item_dif,diffvar)
   data = result$data
