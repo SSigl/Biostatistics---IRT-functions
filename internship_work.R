@@ -265,7 +265,7 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1,xlab=NULL,yl
       values = as.integer(levels(factor(data[,item_B])))
       n_values = length(values)
       # extract and calculate useful entities : discrimination, eta, beta, quotient
-      parameters = as.data.frame(coef[item_B,])
+      if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}
       parameters["Catgr.0",] <-0
       parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
       colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -376,7 +376,7 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1,x
         values = as.integer(levels(factor(data[,item_B])))
         n_values = length(values)
         # extract and calculate useful entities : discrimination, eta, beta, quotient
-        parameters = as.data.frame(coef[item_B,])
+        if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}
         parameters["Catgr.0",] <-0
         parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
         colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -704,7 +704,7 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
         values = as.integer(levels(factor(data[,item_B])))
         n_values = length(values)
         # extract and calculate useful entities : discrimination, eta, beta, quotient
-        parameters = as.data.frame(coef[item_B,])
+        if(class(coef)=="list"){parameters = as.data.frame(coef[[item_B]])}else{parameters = as.data.frame(coef[item_B,])}
         parameters["Catgr.0",] <-0
         parameters <- data.frame(parameters[ sort(row.names(parameters)), ],row.names = sort(row.names(parameters)))
         colnames(parameters)[colnames(parameters)==colnames(parameters)] <- "value"
@@ -929,7 +929,7 @@ recode_var = function(data,list_items){
 #===================================================================================#
 # importation of the dataset
 #setwd("your_path")
-#data <- read.csv("heiq.csv")
+data <- read.csv("heiq.csv")
 
 # list of all items
 list_items = colnames(data)[grep("Heiq", colnames(data))]
