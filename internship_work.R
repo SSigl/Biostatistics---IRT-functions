@@ -301,6 +301,7 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1,xlab=NULL,yl
     if(sc_gp >1){
       simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)
     }
+    
     R = as.integer(levels(factor(simul_data$score)))
     tab_b = data.frame(level_R=R,S = rep(0,length(R)))
     for(i in 1:length(R)){
@@ -586,20 +587,22 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
     if(sc_gp >1){
       simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)
     }
-    tab$S <- rep(0,length(R))
+    tab$S <- 0
+    R=levels(as.factor(simul_data$score))
     for(i in 1:length(R)){
       data_r = subset(simul_data,simul_data$score == as.numeric(R[i]),select=item)
-      tab[i,"S"] <- sum(data_r[,item])/dim(data_r)[1]
+      k=which(tab[,"level_R"]==R[i])
+      tab[k,"S"] <- sum(data_r[,item])/dim(data_r)[1]
     }
     if(display){
-    lines(tab$S,lty = 3,col="red")}
+    lines(tab$level_R,tab$S,lty = 3,col="red")}
     colnames(tab)[colnames(tab)=="S"] <- paste("simul_mean",b,item,sep="_")
   }
   if(display){lines(tab$level_R,tab[,2],col="blue",lwd=2)}
   
   # mean for the splitd items
   if(display){
-  # list of colors to plot the splitd items
+  # list of colors to plot the splitted items
   if(len<10){
     list_colors = c("green3","yellow3","pink","orange","purple","cyan","magenta","gray","aquamarine","coral")
   }else{
@@ -612,12 +615,13 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
   }
   for(l in 1:len){
     item = diff_names[l]
-    tab$S <- rep(0,length(R))
+    tab$S <- 0
+    R=levels(as.factor(data$score))
     for(i in 1:length(R)){
       data_r = subset(data,data$score == as.numeric(R[i]) & is.na(data[,item])==FALSE,select=item)
       tab[i,"S"] <- sum(data_r[,item],na.rm=TRUE)/dim(data_r)[1]
     }
-    lines(tab$S,lty = 1,col=list_colors[l])
+    lines(tab$level_R,tab$S,lty = 1,col=list_colors[l])
     colnames(tab)[colnames(tab)=="S"] <- paste("observed_mean",item,sep="_")
   }
   if(legend){
@@ -929,7 +933,7 @@ recode_var = function(data,list_items){
 #===================================================================================#
 # importation of the dataset
 #setwd("your_path")
-data <- read.csv("heiq.csv")
+#data <- read.csv("heiq.csv")
 
 # list of all items
 list_items = colnames(data)[grep("Heiq", colnames(data))]
