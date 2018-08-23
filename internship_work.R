@@ -221,8 +221,11 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1,xlab=NULL,yl
   data$score <- apply(data,1,sum,na.rm = TRUE)
   if(sc_gp >1){
     quantiles = as.numeric(quantile(data$score,probs=0:sc_gp/sc_gp))
+    options(warn=-1) 
     if(is.na(tryCatch(quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp),error=function(e) NA))==FALSE){
       data$score <- quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp)}
+    options(warn=1) 
+    
   }
   R = as.integer(levels(factor(data$score)))
   tab = data.frame(level_R=R,S = rep(0,length(R)))
@@ -291,8 +294,10 @@ simulation_1_int = function(data,item,itemlist,constraint,B,sc_gp=1,xlab=NULL,yl
     # simulated score
     simul_data$score <- apply(simul_data,1,sum)
     if(sc_gp >1){
+      options(warn=-1) 
       if(is.na(tryCatch(cut(simul_data$score,breaks=quantiles,labels=FALSE),error=function(e) NA))==FALSE){
         simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)}
+      options(warn=1) 
     }
     
     
@@ -327,8 +332,10 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1,x
   data$score <- apply(data,1,sum,na.rm = TRUE)
   if(sc_gp >1){
     quantiles = as.numeric(quantile(data$score,probs=0:sc_gp/sc_gp))
+    options(warn=-1)
     if(is.na(tryCatch(quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp),error=function(e) NA))==FALSE){
       data$score <- quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp)}
+    options(warn=1) 
   }
   R = as.integer(levels(factor(data$score)))
   tab = data.frame(level_R=R,S = rep(0,length(R)))
@@ -426,8 +433,10 @@ simulation_2_int = function(data,item,itemlist,diff_names,constraint,B,sc_gp=1,x
     }
     simul_data$score <- apply(simul_data,1,sum,na.rm=TRUE)
     if(sc_gp >1){
+      options(warn=-1) 
       if(is.na(tryCatch(cut(simul_data$score,breaks=quantiles,labels=FALSE),error=function(e) NA))==FALSE){
         simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)}
+      options(warn=1) 
     }
     R = as.integer(levels(factor(simul_data$score)))
     tab_b = data.frame(level_R=R,S = rep(0,length(R)))
@@ -507,8 +516,10 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
   data$score <- apply(subset(data,select=itemlist),1,sum,na.rm = TRUE)
   if(sc_gp >1){
     quantiles = as.numeric(quantile(data$score,probs=0:sc_gp/sc_gp))
-    if(is.na(tryCatch(quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp),error=function(e) NA))==FALSE){
+    options(warn=-1) 
+    if(is.na(tryCatch(quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp),error=function(e) NA)[1])==FALSE){
     data$score <- quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp)}
+    options(warn=1) 
   }
   R = as.integer(levels(factor(data$score)))
   tab = data.frame(level_R=R,S=rep(0,length(R)))
@@ -582,8 +593,10 @@ simulation_4_int = function(data,item,itemlist,constraint,B,sc_gp=1,diffvar,disp
     # simulated score
     simul_data$score <- apply(simul_data,1,sum)
     if(sc_gp >1){
+      options(warn=-1)
       if(is.na(tryCatch(cut(simul_data$score,breaks=quantiles,labels=FALSE),error=function(e) NA))==FALSE){
         simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)}
+      options(warn=1)
     }
     tab$S <- 0
     R=levels(as.factor(simul_data$score))
@@ -662,8 +675,10 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
   data$score <- apply(data,1,sum,na.rm = TRUE)
   if(sc_gp >1){
     quantiles = as.numeric(quantile(data$score,probs=0:sc_gp/sc_gp))
+    options(warn=-1)
     if(is.na(tryCatch(quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp),error=function(e) NA))==FALSE){
       data$score <- quantcut(data$score,q=sc_gp,na.rm=TRUE,labels=1:sc_gp)}
+    options(warn=1)
   }
   R = as.integer(levels(factor(data$score)))
   tab = data.frame(level_R=R,S = rep(0,length(R)))
@@ -764,8 +779,10 @@ simulation_5_int = function(data,item,itemlist,dif_list,to_dif_list,level,constr
     }
     simul_data$score <- apply(simul_data,1,sum,na.rm=TRUE)
     if(sc_gp >1){
+      options(warn=-1)
       if(is.na(tryCatch(cut(simul_data$score,breaks=quantiles,labels=FALSE),error=function(e) NA))==FALSE){
         simul_data$score <- cut(simul_data$score,breaks=quantiles,labels=FALSE)}
+      options(warn=1)
     }
     R = as.integer(levels(factor(simul_data$score)))
     tab_b = data.frame(level_R=R,S = rep(0,length(R)))
