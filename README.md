@@ -20,13 +20,13 @@ In this study, we need to test DIF (Differential Item Functioning). What is DIF 
 We take an example : suppose we suspect item1 to be a DIF for the covariate "Sex". "Sex" takes only two values : 1 (men) and 2 (women). We then create the variables "item1_1" (for men) and "item1_2" (for women). The variable "item1_1" is equal to the variable "item1" when "Sex" is equal to 1 ("men"), otherwise "item1_1" is equal to NA ; similarly, the variable "item1_2" is equal to the variable "item1" when "Sex" is equal to 2 ("women") ; otherwise "item1_2" is equal to NA ; here is an example :
 
 ```R
-  item2 Sex item1 item1_1 item1_2
-1     2   1     1       1      NA
-2     1   1     1       1      NA
-3     2   2     2      NA       2
-4     4   1     3       3      NA
-5     3   2     2      NA       2
-6     2   1     4       4      NA
+  item1 item2 Sex item1_1 item1_2
+1     1     2   1       1      NA
+2     1     1   1       1      NA
+3     2     2   2      NA       2
+4     3     4   1       3      NA
+5     2     3   2      NA       2
+6     4     2   1       4      NA
 
 ```
 
@@ -70,7 +70,19 @@ This function is an "intermediary function" : we especially use it in the "dif_p
 
 
 As we previously said (in the description of the LRT function), we have to test DIF on the items of the studied database. For this, we have to split each item according to a covariate, the differentiating variable. From the DIF-suspected item and the covariate, we create new items : one for each level of the covariate, equal to the original item when the covariate values the studied level, and equal to NA otherwise. When we do this, there is a risk that the newly-created items do not take all the same values. We take the same example again : suppose we suspect item1 to be a DIF for the covariate "Sex". "Sex" takes only two values : 1 (men) and 2 (women). We then create the variables "item1_1" (for men) and "item1_2" (for women). The variable "item1_1" is equal to the variable "item1" when "Sex" is equal to 1 ("men"), otherwise "item1_1" is equal to NA ; similarly, the variable "item1_2" is equal to the variable "item1" when "Sex" is equal to 2 ("women") ; otherwise "item1_2" is equal to NA.
-Now, suppose item1 has 4 possible values : 1, 2, 3, 4. We might have to face the following situation : item1_1 taking all 4 possible values (1, 2, 3, 4) and item1_2 taking only 3 possibles values (2, 3, 4). This might happen if the value "1" rarely occurs. 
+Now, suppose item1 has 4 possible values : 1, 2, 3, 4. We might have to face the following situation : item1_1 taking all 4 possible values (1, 2, 3, 4) and item1_2 taking only 3 possibles values (2, 3, 4). This might happen if the value "1" rarely occurs. Here is a simple example : 
+
+```R
+  item1 item2 Sex item1_1 item1_2
+1     1     2   1       1      NA
+2     1     1   1       1      NA
+3     1     2   2      NA       1
+4     3     4   1       3      NA
+5     2     3   2      NA       2
+6     4     2   1       4      NA
+```
+You may see that for "Sex = 1", "item1" takes the values "1, 3, 4" ("item1_1") ; and for "Sex=2", "item1" takes the values "1, 2" ("item1_2") ; we then need to collapse the values of "item1" so that the splitted items "item1_1" and "item1_1" take the same values.
+
 This is problematic if we wish to plot and compare the expected values of the newly-created items. 
 
 In order to avoid that, the "collapse" function groups the possible values of the studied item so that all collapsed items take the same values. The "collapse" function is applied to a database, "data", an item, "item", and a differentiating variable, "diffvar" ; "item" and "diffvar" must be of "character" type ;
@@ -92,7 +104,19 @@ The "split" function takes in argument a dataframe, "data", an item, "item", and
 
 The function's running is quite intuitive ; one thing to notice is that we first apply the "collapse" function to the dataframe, the item and the differentiating variable. 
 
-The "split" function returns a list of two elements : a dataframe which includes the original dataframe and the newly-splitted variables, and a vector of names, the names of the newly-splitted variables. We need the two elements because this function is called in other functions and then it is very useful to have the names of the splitted variables.
+The "split" function returns a list of two elements : a dataframe which includes the original dataframe and the newly-splitted variables, and a vector of names, the names of the newly-splitted variables. We need the two elements because this function is called in other functions and then it is very useful to have the names of the splitted variables. Here is an example of the dataframe we could obtain :
+
+
+```R
+  item1 item2 Sex item1_1 item1_2
+1     1     2   1       1      NA
+2     1     1   1       1      NA
+3     2     2   2      NA       2
+4     3     4   1       3      NA
+5     2     3   2      NA       2
+6     4     2   1       4      NA
+
+```
 
 This "split" function is an "intermediary function" : we use it in several function when we need to split an item according to a differenciating variable.
 
