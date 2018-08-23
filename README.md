@@ -17,7 +17,18 @@ We need several packages to correctly run the functions we are about to describe
 In this study, we need to test DIF (Differential Item Functioning). What is DIF ? DIF occurs for an item when people with the same ability but from different groups (groups defined by a covariate, such as gender or age) have unequal probabilities of response. In other words, the conditional probability of success for a DIF-item depends on the value of a covariate. To apply IRT models, we must have no DIF items. We then need to test that hypothesis when we apply a IRT model. To check if an item is DIF for a specific covariate, we proceed as follows :
 
 - from the DIF-suspected item and the covariate, we create new items : one for each level of the covariate, equal to the original item when the covariate values the studied level, and equal to NA otherwise. 
-We take an example : suppose we suspect item1 to be a DIF for the covariate "Sex". "Sex" takes only two values : 1 (men) and 2 (women). We then create the variables "item1_1" (for men) and "item1_2" (for women). The variable "item1_1" is equal to the variable "item1" when "Sex" is equal to 1 ("men"), otherwise "item1_1" is equal to NA ; similarly, the variable "item1_2" is equal to the variable "item1" when "Sex" is equal to 2 ("women") ; otherwise "item1_2" is equal to NA ;
+We take an example : suppose we suspect item1 to be a DIF for the covariate "Sex". "Sex" takes only two values : 1 (men) and 2 (women). We then create the variables "item1_1" (for men) and "item1_2" (for women). The variable "item1_1" is equal to the variable "item1" when "Sex" is equal to 1 ("men"), otherwise "item1_1" is equal to NA ; similarly, the variable "item1_2" is equal to the variable "item1" when "Sex" is equal to 2 ("women") ; otherwise "item1_2" is equal to NA ; here is an example :
+
+’’’
+  item2 Sex item1 item1_1 item1_2
+1     2   1     1       1      NA
+2     1   1     1       1      NA
+3     2   2     2      NA       2
+4     4   1     3       3      NA
+5     3   2     2      NA       2
+6     2   1     4       4      NA
+
+’’’
 
 - we may then apply two IRT models : one model to the database with the original item, and one model to the database with the new items we just created (and at the same time we exclude the original item) ;
 
